@@ -222,7 +222,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
   <button data-tab="reports">דוחות</button>
   <button data-tab="clients">לקוחות ואלפון</button>
 </nav>
-<div class="selbar" id="selBar"><span class="muted">פרויקט נבחר:</span> <b id="selName">לא נבחר פרויקט – בחר בלשונית "פרויקטים"</b><button class="btn sm hide" id="selClear" title="ביטול בחירת הפרויקט">✕</button></div>
+<div class="selbar" id="selBar"><span class="muted">פרויקט נבחר:</span> <b id="selName">לא נבחר פרויקט – בחר בלשונית "פרויקטים"</b><button class="btn sm hide" id="selClear" title="ביטול בחירת הפרויקט">✕</button><span style="flex:1"></span><button class="btn sm hide" id="selBoq" title="פתיחת כתבי הכמויות של הפרויקט (לפי מספר ISO) בתוכנת כתבי כמויות">כתבי כמויות ↗</button></div>
 
 <main>
   <div class="demo hide" id="demoBar">
@@ -352,7 +352,6 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 
       <div class="bar" style="margin-top:12px">
         <button class="btn pri" id="pSave" title="שמירת כרטיס הפרויקט">שמור</button>
-        <button class="btn hide" id="pBoq" title="פתיחת כתבי הכמויות של הפרויקט בתוכנת כתבי הכמויות של טיקטין">כתבי כמויות</button>
         <button class="btn hide" id="pArchive" title="העברת הפרויקט לארכיון – רק לפרויקט בסטטוס גמר, הנהלה או כספים">העברה לארכיון</button>
         <button class="btn" data-reset="project" title="ניקוי כל שדות הכרטיס">איפוס טופס</button>
         <div class="sp"></div>
@@ -465,13 +464,13 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.22';
+const VERSION = '0.21';
 const VERSION_DATE = '07.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
 const SUPABASE_URL = 'https://wiwdszhdjnzyrbxxakbm.supabase.co';
 const SUPABASE_ANON_KEY = '';   // ימולא בהמשך
-const STATUSES = ['טרם התחיל','תכנון','מכרז','ביצוע','מוקפא','גמר','בוטל'];
+const STATUSES = ['טרם התחיל','תכנון','מכרז','ביצוע','גמר','בוטל'];
 const PM_SOFTWARE = ['','זיו','VPLANS','רמדור','אספונט','SHAPEDO','BIM360','אחר'];
 const ROLE_HE = {management:'הנהלה',finance:'כספים',secretary:'מזכירות',team_lead:'ראש צוות',employee:'עובד'};
 
@@ -512,7 +511,6 @@ function loadReal(){
   S.staff=d.staff.map(r=>({id:r[0],full_name:r[1],email:r[2],active:!!r[3]}));
   S.clients=d.clients.map(r=>({id:r[0],name:r[1],phone:r[2],email:r[3],city:r[4]}));
   S.projects=d.projects.map(r=>({id:r[0],iso_number:r[1],name:r[2],client_id:r[3],status:r[4],responsible_engineer_id:r[5],project_type:r[6],orig_status:r[7]})).sort((a,b)=>(parseInt(b.iso_number)||0)-(parseInt(a.iso_number)||0));
-  S.projects.forEach(p=>{ if(/מוקפא/.test(`${p.iso_number||''} ${p.name||''} ${p.orig_status||''}`)) p.status='מוקפא'; });  /* מסומן "מוקפא" במאסטר פלאן */
   S.contacts=d.contacts.map(r=>({id:r[0],full_name:r[1],client_id:r[2],email:r[3],phone:r[4],mobile:r[5]}));
   S.entries=d.entries.map(r=>({id:r[0],work_date:r[1],staff_id:r[2],project_id:r[3],hours:r[4],start_time:r[5]||'',end_time:r[6]||'',notes:r[7]}));
   S.team=new Map(); const addT=(p,s)=>{ if(!p||!s) return; let t=S.team.get(p); if(!t) S.team.set(p,t=new Set()); t.add(s); };
@@ -593,11 +591,13 @@ function sbDB(sb){
 /* ================= HELPERS ================= */
 const isFin = () => ['management','finance'].includes(me.role);
 const isMgmt = () => me.role==='management';
+/* כתבי כמויות – הנהלה, ראשי צוותים ומזכירות (לפי טבלת ההרשאות; השרת בודק גם הרשאה אישית) */
+const BOQ_URL = 'https://tiktiny.github.io/tiktin-boq/';
+const canBoq = () => ['management','team_lead','secretary'].includes(me.role);
 const canStatus = () => ['management','finance','team_lead'].includes(me.role);
 const canArchive = () => ['management','finance'].includes(me.role);
 const ARCH_VIEW = ['management','finance'];   /* מי רואה את הארכיון – לפי טבלת ההרשאות */
 const canViewArch = () => ARCH_VIEW.includes(me.role);
-const BOQ_URL = '';   /* כתובת תוכנת כתבי הכמויות של טיקטין – תמולא כשהתוכנה תעלה לאוויר */
 const projLabel = p => p ? `${p.iso_number||''} – ${p.name}`+(p.alias?` (${p.alias})`:'') : '';
 const IX={p:new Map(),c:new Map(),s:new Map(),lbl:new Map()};
 function reindex(){ IX.p=new Map(S.projects.map(p=>[p.id,p])); IX.c=new Map(S.clients.map(c=>[c.id,c])); IX.s=new Map(S.staff.map(s=>[s.id,s])); IX.lbl=new Map(); S.projects.forEach(p=>{ IX.lbl.set(projLabel(p),p); if(p.iso_number && !IX.lbl.has(p.iso_number.trim())) IX.lbl.set(p.iso_number.trim(),p); }); }
@@ -825,9 +825,12 @@ function selectProject(p){
   curProj=p||null; newMode=false;
   $('#selName').textContent = p ? projLabel(p) : 'לא נבחר פרויקט – בחר בלשונית "פרויקטים"';
   $('#selClear').classList.toggle('hide',!p);
+  $('#selBoq').classList.toggle('hide',!p || !p.iso_number || !canBoq());
   $$('#pTable tr.sel').forEach(tr=>tr.classList.remove('sel')); if(p){ const tr=$(`#pTable tr[data-id="${p.id}"]`); tr&&tr.classList.add('sel'); }
   syncHoursProject();
 }
+$('#selBoq').onclick=()=>{ const p=curProj; if(!p||!p.iso_number) return;
+  window.open(BOQ_URL+'?iso='+encodeURIComponent(String(p.iso_number).trim())+'&name='+encodeURIComponent(p.name||'')+'&client='+encodeURIComponent(clientName(p.client_id)||''),'tiktin-boq'); };
 $('#selClear').onclick=()=>{ selectProject(null); const t=$('nav.tabs button.on')?.dataset.tab; if(t) showTab(t); };
 function syncHoursProject(){
   const el=$('#hProject'); if(!el) return;
@@ -847,8 +850,6 @@ function showCard(){
   RELOC.forEach(r=>$('#p_reloc_'+r).checked=!!p['reloc_'+r]);
   $('#pCardTitle').textContent = curProj?`כרטיס פרויקט ${p.iso_number||''}${p.archived?' · בארכיון':''}`:'פרויקט חדש';
   const stLock = !!curProj && !canStatus(); $('#p_status').disabled = stLock; $('#p_status').title = stLock ? 'שינוי סטטוס – הנהלה, כספים או ראש צוות' : '';
-  const qb=$('#pBoq'); qb.classList.toggle('hide', !curProj); qb.disabled = !BOQ_URL;
-  qb.title = BOQ_URL ? 'פתיחת כתבי הכמויות של הפרויקט בתוכנת כתבי הכמויות של טיקטין' : 'תוכנת כתבי הכמויות של טיקטין עדיין בבנייה – הכפתור יופעל כשהיא תעלה לאוויר';
   const ab=$('#pArchive'); ab.classList.toggle('hide', !curProj || !canArchive());
   if(curProj){ ab.textContent = p.archived ? 'החזרה מהארכיון' : 'העברה לארכיון'; ab.disabled = !p.archived && p.status!=='גמר';
     ab.title = p.archived ? 'החזרת הפרויקט לרשימת הפרויקטים הפעילים' : (p.status==='גמר' ? 'העברת הפרויקט לארכיון' : 'אפשר להעביר לארכיון רק פרויקט בסטטוס גמר'); }
@@ -915,7 +916,6 @@ $('#pSave').onclick=async()=>{
   fillDatalists(); selectProject(saved); renderProjects(); showCard(); toast('הפרויקט נשמר');
 };
 
-$('#pBoq').onclick=()=>{ if(!curProj || !BOQ_URL) return; window.open(`${BOQ_URL}?iso=${encodeURIComponent((curProj.iso_number||'').trim())}&name=${encodeURIComponent(curProj.name||'')}`,'_blank'); };
 $('#pArchive').onclick=async()=>{ if(!curProj || !canArchive()) return;
   if(!curProj.archived && curProj.status!=='גמר') return toast('אפשר להעביר לארכיון רק פרויקט בסטטוס גמר');
   const toArch=!curProj.archived;
@@ -1029,6 +1029,10 @@ function startApp(){
   $('#pNew').classList.toggle('hide',!isFin());
   fillDatalists(); initHours(); initProjects(); initReports(); renderClients(); wireInputs();
   selectProject(curProj); showTab('projects');
+  /* מעבר מכתבי כמויות: ?iso=12345 – פותח את כרטיס הפרויקט */
+  const isoQ=(new URLSearchParams(location.search).get('iso')||'').trim();
+  if(isoQ){ const p=S.projects.find(x=>String(x.iso_number||'').trim()===isoQ); history.replaceState(null,'',location.pathname);
+    if(p){ selectProject(p); showTab('card'); } else toast('פרויקט '+isoQ+' לא נמצא ברשימת הפרויקטים'); }
 }
 $('#btnOut').onclick=()=>DB.signOut();
 $('#loginVer').textContent = `גרסה ${VERSION} · עודכן ${VERSION_DATE}`;
