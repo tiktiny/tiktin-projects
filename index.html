@@ -22,7 +22,7 @@ header img{height:46px}
 header .title{font-size:22px;font-weight:800;letter-spacing:2px;color:var(--red)}
 header .ver{font-size:11px;color:var(--muted)}
 header .sp{flex:1}
-header .user{font-size:13px;color:var(--muted)}
+header .title .who{letter-spacing:0;margin-right:22px}
 .zoom{display:flex;align-items:center;gap:3px;border:1px solid var(--line);border-radius:8px;padding:2px}
 .zoom button{border:none;background:#fff;height:28px;min-width:28px;border-radius:6px;cursor:pointer;font-weight:700;font-size:15px}
 .zoom button:hover{background:#ffe9ea;color:var(--red)}
@@ -201,7 +201,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <header>
   <img src="logo.png" alt="טיקטין">
   <div>
-    <div class="title">PROJECTS</div>
+    <div class="title">PROJECTS<span class="who" id="who"></span></div>
     <div class="ver" id="ver"></div>
   </div>
   <div class="sp"></div>
@@ -211,7 +211,6 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
     <button id="zIn" title="הגדלת התצוגה">+</button>
     <button id="zFit" title="התאמה למסך – התצוגה ממלאת את כל רוחב המסך ומתעדכנת כשמשנים את גודל החלון">⤢</button>
   </div>
-  <span class="user" id="who"></span>
   <button class="btn sm" id="btnOut" title="יציאה מהמערכת">יציאה</button>
 </header>
 <nav class="tabs">
@@ -464,13 +463,13 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.21';
+const VERSION = '0.23';
 const VERSION_DATE = '07.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
 const SUPABASE_URL = 'https://wiwdszhdjnzyrbxxakbm.supabase.co';
 const SUPABASE_ANON_KEY = '';   // ימולא בהמשך
-const STATUSES = ['טרם התחיל','תכנון','מכרז','ביצוע','גמר','בוטל'];
+const STATUSES = ['טרם התחיל','תכנון','מכרז','ביצוע','מוקפא','גמר','בוטל'];
 const PM_SOFTWARE = ['','זיו','VPLANS','רמדור','אספונט','SHAPEDO','BIM360','אחר'];
 const ROLE_HE = {management:'הנהלה',finance:'כספים',secretary:'מזכירות',team_lead:'ראש צוות',employee:'עובד'};
 
@@ -511,6 +510,7 @@ function loadReal(){
   S.staff=d.staff.map(r=>({id:r[0],full_name:r[1],email:r[2],active:!!r[3]}));
   S.clients=d.clients.map(r=>({id:r[0],name:r[1],phone:r[2],email:r[3],city:r[4]}));
   S.projects=d.projects.map(r=>({id:r[0],iso_number:r[1],name:r[2],client_id:r[3],status:r[4],responsible_engineer_id:r[5],project_type:r[6],orig_status:r[7]})).sort((a,b)=>(parseInt(b.iso_number)||0)-(parseInt(a.iso_number)||0));
+  S.projects.forEach(p=>{ if(/מוקפא/.test(`${p.iso_number||''} ${p.name||''} ${p.orig_status||''}`)) p.status='מוקפא'; });  /* מסומן "מוקפא" במאסטר פלאן */
   S.contacts=d.contacts.map(r=>({id:r[0],full_name:r[1],client_id:r[2],email:r[3],phone:r[4],mobile:r[5]}));
   S.entries=d.entries.map(r=>({id:r[0],work_date:r[1],staff_id:r[2],project_id:r[3],hours:r[4],start_time:r[5]||'',end_time:r[6]||'',notes:r[7]}));
   S.team=new Map(); const addT=(p,s)=>{ if(!p||!s) return; let t=S.team.get(p); if(!t) S.team.set(p,t=new Set()); t.add(s); };
@@ -1024,7 +1024,7 @@ function startApp(){
   if(!S.team) buildTeamFromEntries();
   $('#login').classList.add('hide'); $('#app').classList.remove('hide');
   $('#ver').textContent = `גרסה ${VERSION} · עודכן ${VERSION_DATE}`;
-  $('#who').textContent = `${me.name} · ${ROLE_HE[me.role]||''}`;
+  $('#who').textContent = `${me.name} - ${ROLE_HE[me.role]||''}`;
   $('#tabMoney').classList.toggle('hide',!isFin());
   $('#pNew').classList.toggle('hide',!isFin());
   fillDatalists(); initHours(); initProjects(); initReports(); renderClients(); wireInputs();
