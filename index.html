@@ -104,6 +104,13 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 .tot{font-weight:700}
 .hide{display:none!important}
 #login,#gate{min-height:100vh;display:flex;align-items:center;justify-content:center}
+#busy{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.55)}
+#busy .bx{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;box-shadow:0 6px 24px rgba(0,0,0,.12);text-align:center}
+#busyTxt{font-size:13px;color:var(--muted);margin-top:4px}
+#busy .flow{stroke-dasharray:14 22;animation:tpflow .9s linear infinite}
+#busy .lamp{animation:tplamp 1.8s ease-in-out infinite}
+@keyframes tpflow{to{stroke-dashoffset:-36}}
+@keyframes tplamp{0%,40%{opacity:.15}60%,100%{opacity:1}}
 #gate .box,#login .box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:30px 34px;text-align:center;width:min(420px,92vw)}
 #login img,#gate img{height:70px}
 #login h1,#gate h1{color:var(--red);letter-spacing:4px;margin:10px 0 18px}
@@ -145,6 +152,17 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
   </div>
 </div>
 
+<div id="busy" class="hide" aria-live="polite"><div class="bx">
+  <svg viewBox="0 0 260 70" width="260" height="70" aria-hidden="true">
+    <g fill="none" stroke="#a81f24" stroke-width="2.2" stroke-linejoin="round">
+      <rect x="214" y="18" width="34" height="38" rx="3" fill="#fff"/><path d="M233 24l-7 12h6l-4 12 9-15h-6l4-9z" fill="#f07a22" stroke="none"/>
+      <path d="M14 34l17-14 17 14v22H14z" fill="#fff"/><rect x="26" y="42" width="9" height="14"/>
+    </g>
+    <path class="wire" d="M212 38 C 170 20, 150 56, 120 38 S 70 20, 52 40" fill="none" stroke="#d9d9d9" stroke-width="3"/>
+    <path class="flow" d="M212 38 C 170 20, 150 56, 120 38 S 70 20, 52 40" fill="none" stroke="#f07a22" stroke-width="3.2" stroke-linecap="round"/>
+    <circle class="lamp" cx="31" cy="31" r="4" fill="#ffd34d"/>
+  </svg>
+  <div id="busyTxt">טוען…</div></div></div>
 <div id="gate" class="hide">
   <div class="box">
     <img src="logo.png" alt="טיקטין">
@@ -210,7 +228,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
   <div class="demo hide" id="demoBar">
     <b>מצב הדגמה</b> – נתונים לדוגמה, שום דבר לא נשמר בשרת.
     <span>הצג כ:</span>
-    <select id="demoRole"><option value="management">הנהלה</option><option value="finance">מזכירות וכספים</option><option value="team_lead">ראש צוות</option><option value="employee">עובד</option></select>
+    <select id="demoRole"><option value="management">הנהלה</option><option value="finance">כספים</option><option value="secretary">מזכירות</option><option value="team_lead">ראש צוות</option><option value="employee">עובד</option></select>
     <button class="btn sm hide" id="demoReset" title="מחיקת כל מה שהוספת או שינית בהתנסות במחשב הזה – חזרה לנתונים המקוריים">ביטול השינויים שלי</button>
     <button class="btn sm hide" id="appInstall" title="התקנת PROJECTS כאפליקציה במחשב – אייקון בשולחן העבודה ופתיחה בחלון נפרד">התקנה במחשב</button>
   </div>
@@ -222,6 +240,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
         <div class="fld" style="flex:2;min-width:220px"><input id="pSearch" placeholder="חיפוש לפי מספר ISO, שם, לקוח או חברת ניהול"><button class="x" tabindex="-1" title="נקה">✕</button></div>
         <div class="fld" style="flex:1;min-width:140px"><select id="pStatusF"><option value="">כל הסטטוסים</option></select></div>
         <button class="btn" id="pScope" title="מעבר בין הפרויקטים שלך לכל הפרויקטים במשרד">הצג את כל הפרויקטים</button>
+        <button class="btn" id="pArch" title="הצגת הפרויקטים שהועברו לארכיון">ארכיון</button>
         <button class="btn pri" id="pNew" title="פתיחת כרטיס פרויקט חדש">+ פרויקט חדש</button>
       </div>
       <div class="tblwrap" style="margin-top:8px"><table id="pTable"></table></div>
@@ -333,6 +352,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 
       <div class="bar" style="margin-top:12px">
         <button class="btn pri" id="pSave" title="שמירת כרטיס הפרויקט">שמור</button>
+        <button class="btn hide" id="pArchive" title="העברת הפרויקט לארכיון – רק לפרויקט בסטטוס גמר, הנהלה או כספים">העברה לארכיון</button>
         <button class="btn" data-reset="project" title="ניקוי כל שדות הכרטיס">איפוס טופס</button>
         <div class="sp"></div>
         <button class="btn" data-exp="xlsx" data-t="pCard">Excel</button>
@@ -441,10 +461,10 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <div id="toast"></div>
 <div id="modal" class="hide"><div class="mbox"><div id="modalText"></div><div class="bar" id="modalBtns" style="justify-content:center;margin-top:16px"></div></div></div>
 
-<script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירוז", "אורטל", "מורן", "קובי"]}</script>
+<script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירוז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.18';
+const VERSION = '0.19';
 const VERSION_DATE = '07.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
@@ -452,7 +472,7 @@ const SUPABASE_URL = 'https://wiwdszhdjnzyrbxxakbm.supabase.co';
 const SUPABASE_ANON_KEY = '';   // ימולא בהמשך
 const STATUSES = ['טרם התחיל','תכנון','מכרז','ביצוע','גמר','בוטל'];
 const PM_SOFTWARE = ['','זיו','VPLANS','רמדור','אספונט','SHAPEDO','BIM360','אחר'];
-const ROLE_HE = {management:'הנהלה',finance:'מזכירות וכספים',team_lead:'ראש צוות',employee:'עובד'};
+const ROLE_HE = {management:'הנהלה',finance:'כספים',secretary:'מזכירות',team_lead:'ראש צוות',employee:'עובד'};
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -462,12 +482,17 @@ const today = () => { const d=new Date(); return new Date(d.getTime()-d.getTimez
 const toast = m => {const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200)};
 /* render big tables in chunks so typing stays fast */
 const JOBS={};
+const FLUSH={};
+let busyT=null;
+function showBusy(t,delay=120){ clearTimeout(busyT); busyT=setTimeout(()=>{ $('#busyTxt').textContent=t||'טוען…'; $('#busy').classList.remove('hide'); },delay); }
+function hideBusy(){ clearTimeout(busyT); $('#busy').classList.add('hide'); }
 function chunkRender(id,head,rows,rowFn){
-  const t=$('#'+id); clearTimeout(JOBS[id]);
-  t.innerHTML=head+'<tbody>'+rows.slice(0,150).map(rowFn).join('')+'</tbody>';
-  const tb=t.tBodies[0]; let i=150;
-  const step=()=>{ if(i>=rows.length) return; tb.insertAdjacentHTML('beforeend',rows.slice(i,i+600).map(rowFn).join('')); i+=600; JOBS[id]=setTimeout(step,0); };
-  JOBS[id]=setTimeout(step,30);
+  const t=$('#'+id); clearTimeout(JOBS[id]); const wrap=t.closest('.tblwrap');
+  t.innerHTML=head+'<tbody>'+rows.slice(0,200).map(rowFn).join('')+'</tbody>';
+  const tb=t.tBodies[0]; let i=200;
+  const more=n=>{ if(i>=rows.length) return; tb.insertAdjacentHTML('beforeend',rows.slice(i,i+n).map(rowFn).join('')); i+=n; };
+  FLUSH[id]=()=>more(rows.length);
+  if(wrap){ wrap.scrollTop=0; wrap.onscroll=()=>{ if(wrap.scrollTop+wrap.clientHeight>wrap.scrollHeight-500) more(300); }; }
 }
 const debounce=(f,ms)=>{ let h; return (...a)=>{ clearTimeout(h); h=setTimeout(()=>f(...a),ms); }; };
 const hrs = (s,e)=>{ if(!s||!e) return null; const [a,b]=s.split(':').map(Number),[c,d]=e.split(':').map(Number); let m=(c*60+d)-(a*60+b); if(m<0)m+=1440; return Math.round(m/6)/10; };
@@ -566,6 +591,10 @@ function sbDB(sb){
 /* ================= HELPERS ================= */
 const isFin = () => ['management','finance'].includes(me.role);
 const isMgmt = () => me.role==='management';
+const canStatus = () => ['management','finance','team_lead'].includes(me.role);
+const canArchive = () => ['management','finance'].includes(me.role);
+const ARCH_VIEW = ['management','finance'];   /* מי רואה את הארכיון – לפי טבלת ההרשאות */
+const canViewArch = () => ARCH_VIEW.includes(me.role);
 const projLabel = p => p ? `${p.iso_number||''} – ${p.name}`+(p.alias?` (${p.alias})`:'') : '';
 const IX={p:new Map(),c:new Map(),s:new Map(),lbl:new Map()};
 function reindex(){ IX.p=new Map(S.projects.map(p=>[p.id,p])); IX.c=new Map(S.clients.map(c=>[c.id,c])); IX.s=new Map(S.staff.map(s=>[s.id,s])); IX.lbl=new Map(); S.projects.forEach(p=>{ IX.lbl.set(projLabel(p),p); if(p.iso_number && !IX.lbl.has(p.iso_number.trim())) IX.lbl.set(p.iso_number.trim(),p); }); }
@@ -609,7 +638,7 @@ function showTab(t){
   TABS.forEach(x=>$('#tab-'+x).classList.toggle('hide',x!==t));
   if(t==='card') showCard();
   if(t==='money') showMoney();
-  if(t==='reports') renderReport();
+  if(t==='reports'){ showBusy('מכין את הדוח…'); setTimeout(()=>{ try{ renderReport(); } finally{ hideBusy(); } },30); }
   if(t==='hours'){ checkTimerProject(); syncHoursProject(); }
   window.scrollTo({top:0});
 }
@@ -753,6 +782,8 @@ function myProjectIds(){
   return ids;
 }
 $('#pScope').onclick=()=>{ showAll=!showAll; renderProjects(); };
+let showArch=false;
+$('#pArch').onclick=()=>{ showArch=!showArch; renderProjects(); };
 function initProjects(){
   showAll = isFin();
   $('#pStatusF').innerHTML = '<option value="">כל הסטטוסים</option>'+STATUSES.map(s=>`<option>${s}</option>`).join('');
@@ -772,7 +803,9 @@ function renderProjects(){
   const mine = showAll ? null : myProjectIds();
   $('#pScope').textContent = showAll ? 'הצג רק את הפרויקטים שלי' : 'הצג את כל הפרויקטים';
   $('#pScope').classList.toggle('on',!!showAll);
-  const rows=S.projects.filter(p=>(showAll || [...mine].some(sid=>inTeam(p,sid))) && (!st||p.status===st) && (!q || (p._s||(p._s=[p.iso_number,p.name,p.alias,clientName(p.client_id),p.pm_company,staffName(p.responsible_engineer_id)].join(' ').toLowerCase())).includes(q)));
+  if(!canViewArch()) showArch=false; $('#pArch').classList.toggle('hide',!canViewArch());
+  $('#pArch').textContent = showArch ? 'חזרה לפרויקטים פעילים' : 'ארכיון'; $('#pArch').classList.toggle('on',showArch);
+  const rows=S.projects.filter(p=>(showArch ? !!p.archived : !p.archived) && (showAll || showArch || [...mine].some(sid=>inTeam(p,sid))) && (!st||p.status===st) && (!q || (p._s||(p._s=[p.iso_number,p.name,p.alias,clientName(p.client_id),p.pm_company,staffName(p.responsible_engineer_id)].join(' ').toLowerCase())).includes(q)));
   const col=PCOLS.find(c=>c[0]===PSORT.key), f=col[2], d=PSORT.dir;
   const keyed=rows.map(p=>[f(p),parseInt(p.iso_number)||0,p]); const num=typeof (keyed[0]||[0])[0]==='number';
   keyed.sort((A,B)=>{ if(!num){ if(!A[0]&&B[0]) return 1; if(A[0]&&!B[0]) return -1; } const r = num ? A[0]-B[0] : COLL.compare(A[0],B[0]); return r? r*d : B[1]-A[1]; });
@@ -780,7 +813,7 @@ function renderProjects(){
   const hd=PCOLS.map(c=>`<th data-sort="${c[0]}" class="sortable${(c[0]==='eng'||c[0]==='pm')?' hide-m':''}" title="מיון לפי ${c[1]}">${c[1]} ${PSORT.key===c[0]?(PSORT.dir>0?'▲':'▼'):'<span class="muted">⇅</span>'}</th>`).join('');
   chunkRender('pTable',`<thead><tr>${hd}</tr></thead>`, rows,
     p=>`<tr class="click ${curProj?.id===p.id?'sel':''}" data-id="${p.id}"><td>${esc(p.iso_number)}</td><td>${esc(p.name)}${p.alias?` <span class="muted">(${esc(p.alias)})</span>`:''}</td><td>${esc(clientName(p.client_id))}</td><td><span class="pill st-${(p.status||'').split(' ')[0]}">${esc(p.status)}</span></td><td class="hide-m">${esc(staffName(p.responsible_engineer_id))}</td><td class="hide-m">${esc(p.pm_company)}</td></tr>`);
-  $('#pCount').textContent = (showAll?'כל הפרויקטים · ':'הפרויקטים שלי · ')+`${rows.length.toLocaleString('he-IL')} פרויקטים`+(!showAll&&!rows.length&&!q?' – לא נמצאו פרויקטים שאתה בצוות שלהם, לחץ "הצג את כל הפרויקטים"':'');
+  $('#pCount').textContent = (showArch?'ארכיון · ':showAll?'כל הפרויקטים · ':'הפרויקטים שלי · ')+`${rows.length.toLocaleString('he-IL')} פרויקטים`+(!showAll&&!rows.length&&!q?' – לא נמצאו פרויקטים שאתה בצוות שלהם, לחץ "הצג את כל הפרויקטים"':'');
 }
 const P_FIELDS=['iso_number:p_iso','name:p_name','alias:p_alias','status:p_status','pm_company:p_pm_company','pm_software:p_pm_software','iec_network_planner:p_iec_planner','iec_halav:p_iec_halav','notes:p_notes'];
 const RELOC=['electric','bezeq','hot','cellcom','partner','unlimited'];
@@ -809,7 +842,11 @@ function showCard(){
   $('#p_client').value = clientName(p.client_id);
   $('#p_engineer').value = p.responsible_engineer_id??'';
   RELOC.forEach(r=>$('#p_reloc_'+r).checked=!!p['reloc_'+r]);
-  $('#pCardTitle').textContent = curProj?`כרטיס פרויקט ${p.iso_number||''}`:'פרויקט חדש';
+  $('#pCardTitle').textContent = curProj?`כרטיס פרויקט ${p.iso_number||''}${p.archived?' · בארכיון':''}`:'פרויקט חדש';
+  const stLock = !!curProj && !canStatus(); $('#p_status').disabled = stLock; $('#p_status').title = stLock ? 'שינוי סטטוס – הנהלה, כספים או ראש צוות' : '';
+  const ab=$('#pArchive'); ab.classList.toggle('hide', !curProj || !canArchive());
+  if(curProj){ ab.textContent = p.archived ? 'החזרה מהארכיון' : 'העברה לארכיון'; ab.disabled = !p.archived && p.status!=='גמר';
+    ab.title = p.archived ? 'החזרת הפרויקט לרשימת הפרויקטים הפעילים' : (p.status==='גמר' ? 'העברת הפרויקט לארכיון' : 'אפשר להעביר לארכיון רק פרויקט בסטטוס גמר'); }
   const locked = !!curProj && !isMgmt();
   $$('#pCard .lockable').forEach(i=>{ i.disabled=locked; i.nextElementSibling.classList.toggle('hide',locked); i.title=locked?'מגיע ממאסטר פלאן – רק הנהלה יכולה לשנות':''; });
   $('#lockNote').classList.toggle('hide',!locked);
@@ -867,10 +904,18 @@ $('#pSave').onclick=async()=>{
   p.client_id=c?.id??null; p.responsible_engineer_id=+$('#p_engineer').value||null;
   RELOC.forEach(r=>p['reloc_'+r]=$('#p_reloc_'+r).checked);
   if(curProj && !isMgmt()){ p.iso_number=curProj.iso_number; p.name=curProj.name; p.client_id=curProj.client_id; }
+  if(curProj && !canStatus()) p.status=curProj.status;
   if(curProj) p.id=curProj.id;
   const saved=await DB.saveProject(p);
   fillDatalists(); selectProject(saved); renderProjects(); showCard(); toast('הפרויקט נשמר');
 };
+
+$('#pArchive').onclick=async()=>{ if(!curProj || !canArchive()) return;
+  if(!curProj.archived && curProj.status!=='גמר') return toast('אפשר להעביר לארכיון רק פרויקט בסטטוס גמר');
+  const toArch=!curProj.archived;
+  if(GATE){ try{ const r=await rpc('demo_archive_set',{p_token:GATE.tok,p_pid:curProj.id,p_on:toArch}); if(r.error) return toast(r.error==='expired'?'פג תוקף הכניסה – צא והיכנס שוב':'אין הרשאה להעביר לארכיון'); }catch(e){ return toast('אין חיבור לשרת – הארכיון לא עודכן'); } }
+  else await DB.saveProject({id:curProj.id, archived:toArch});
+  const pr=projById(curProj.id); pr.archived=toArch; fillDatalists(); selectProject(pr); renderProjects(); showCard(); toast(toArch?'הפרויקט הועבר לארכיון':'הפרויקט הוחזר מהארכיון'); };
 
 /* ================= REPORTS ================= */
 function initReports(){ const d=new Date(); $('#rFrom').value=localISO(new Date(d.getFullYear(),0,1)); $('#rTo').value=today(); }
@@ -939,6 +984,7 @@ function cleanClone(t){ const c=t.cloneNode(true); c.querySelectorAll('.noprint'
 let xlsxLoading=null;
 function loadXLSX(){ return xlsxLoading ||= new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)}); }
 $$('[data-exp]').forEach(b=>b.onclick=async()=>{
+  FLUSH[b.dataset.t]?.();
   const t=cleanClone(tableFor(b.dataset.t)), name='PROJECTS_'+b.dataset.t+'_'+today();
   if(b.dataset.exp==='xlsx'){ await loadXLSX(); const wb=XLSX.utils.book_new(); const ws=XLSX.utils.table_to_sheet(t); ws['!views']=[{RTL:true}]; XLSX.utils.book_append_sheet(wb,ws,'נתונים'); XLSX.writeFile(wb,name+'.xlsx'); }
   if(b.dataset.exp==='doc'){ const html=`<html dir="rtl"><head><meta charset="utf-8"><style>body{font-family:Arial;direction:rtl}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px 6px;text-align:right}</style></head><body><h2>טיקטין – PROJECTS</h2>${t.outerHTML}</body></html>`;
@@ -1008,20 +1054,20 @@ async function gateApply(n,res,cached){
   if(!res.ver) return {nodata:true};
   let text=res.data; if(text==null){ text=cached.text; } else cachePut(res.ver,text);
   await gateDecrypt(JSON.parse(text),res.k);
-  const i=TRIAL.users.indexOf(n); GATE={user:n,role:res.r,idx:i<0?0:i};
+  const i=TRIAL.users.indexOf(n); GATE={user:n,role:res.r,idx:i<0?0:i,sw:!!res.sw,adm:!!res.adm,arch:res.arch||[],tok:res.token||null};
   return {ok:true};
 }
 async function gateOpen(n,pw,remember){
   const cached=await cacheGet();
   const res=await rpc('demo_open',{p_user:n,p_pw:pw,p_ua:UA(),p_have:cached?.ver||null,p_remember:!!remember});
   const r=await gateApply(n,res,cached);
-  if(r.ok) lsSet(res.token?{n,t:res.token,exp:res.exp}:{n});
+  if(r.ok) lsSet(remember&&res.token?{n,t:res.token,exp:res.exp}:{n});
   return r;
 }
 async function gateResume(m){
   const cached=await cacheGet();
   const res=await rpc('demo_resume',{p_token:m.t,p_ua:UA(),p_have:cached?.ver||null});
-  return gateApply(res.n||m.n,res,cached);
+  const r=await gateApply(res.n||m.n,res,cached); if(r.ok) GATE.tok=m.t; return r;
 }
 async function gateUpload(n,pw,file){
   const text=await file.text(); const E=JSON.parse(text); if(!E.ct||!E.iv) throw new Error('קובץ לא תקין');
@@ -1044,7 +1090,9 @@ async function gate(){
   const m=lsGet();
   const resetTok=new URLSearchParams(location.search).get('reset');
   if(!resetTok && m?.t && m.exp>Date.now() && TRIAL.users.includes(m.n)){
+    showBusy('פותח את הנתונים…',0);
     try{ const r=await gateResume(m); if(r.ok) return; }catch(e){ if(e.status) lsSet({n:m.n}); }
+    hideBusy();
   } else if(m?.t){ lsSet({n:m.n}); }
   $('#gateVer').textContent=`גרסה ${VERSION} · עודכן ${VERSION_DATE}`;
   $('#gateUser').innerHTML='<option value="">מי נכנס/ת?</option>'+TRIAL.users.map(u=>`<option>${esc(u)}</option>`).join('');
@@ -1056,7 +1104,7 @@ async function gate(){
     const err=t=>{ $('#gateErr').textContent=t; }, msg=t=>{ $('#gateMsg').textContent=t; };
     const go=async()=>{ const n=$('#gateUser').value, pw=$('#gatePw').value; err(''); msg('');
       if(!n) return err('בחר/י שם'); if(!pw) return err('הקלד/י סיסמה');
-      busy(true,$('#gateGo'),'פותח…');
+      busy(true,$('#gateGo'),'פותח…'); showBusy('פותח את הנתונים…',0);
       try{
         const f=$('#gateFile').files[0];
         if(f){ await gateUpload(n,pw,f); $('#gateFile').value=''; }
@@ -1064,6 +1112,7 @@ async function gate(){
         if(r.nodata){ err('הנתונים עדיין לא הועלו לשרת'+(n==='יובל'?' – בחר את קובץ הנתונים והקש כניסה':'')); $('#gateUp').classList.toggle('hide',n!=='יובל'); }
         else { $('#gate').classList.add('hide'); done(); }
       }catch(e){ err(errMsg(e)); $('#gatePw').select(); }
+      hideBusy();
       busy(false,$('#gateGo'),'כניסה'); };
     $('#gateGo').onclick=go; $('#gatePw').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
     $('#gToChange').onclick=()=>{ gateMode('change'); $('#gOld').value=$('#gatePw').value; ($('#gOld').value?$('#gNew'):$('#gOld')).focus(); };
@@ -1124,8 +1173,8 @@ async function boot(){
   if(demo){
     const tB=performance.now();
     DB=demoDB; await DB.load(); $('#demoBar').classList.remove('hide');
-    if(REAL!==false && GATE){ localize(DB);
-      $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (נכון ל-05.11.2026) · ללא נתונים כספיים · מה שמוסיפים או משנים נשמר רק במחשב הזה ולא בשרת · `; $('#demoRole').value=me.role; }
+    if(REAL!==false && GATE){ localize(DB); const AS=new Set(GATE.arch); S.projects.forEach(p=>p.archived=AS.has(p.id));
+      $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (נכון ל-05.11.2026) · ללא נתונים כספיים · מה שמוסיפים או משנים נשמר רק במחשב הזה ולא בשרת · `; $('#demoRole').value=me.role; $('#demoRole').classList.toggle('hide',!GATE.sw); $('#demoRole').previousElementSibling.classList.toggle('hide',!GATE.sw); }
     else if(REAL!==false){ makeReadOnly(DB);
       $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (נכון ל-05.11.2026) · ללא נתונים כספיים · קריאה בלבד, אין עדכונים · `; }
     const byName=n=>S.staff.find(x=>x.full_name===n)?.id;
@@ -1150,7 +1199,7 @@ async function boot(){
   try{ await DB.load(); startApp(); } catch(e){ $('#login').classList.remove('hide'); toast('אין הרשאה למערכת'); await sb.auth.signOut(); }
 }
 const TRIAL = (()=>{ try{ return JSON.parse(document.getElementById('trialCfg')?.textContent||'null'); }catch(e){ return null; } })();
-if(TRIAL) gate().then(boot); else boot();
+if(TRIAL) gate().then(async()=>{ showBusy('טוען את הפרויקטים…',0); await new Promise(r=>setTimeout(r,20)); try{ await boot(); } finally{ hideBusy(); } }); else boot();
 </script>
 </body>
 </html>
