@@ -463,7 +463,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.23';
+const VERSION = '0.24';
 const VERSION_DATE = '07.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
@@ -1064,7 +1064,7 @@ async function gateApply(n,res,cached){
   if(!res.ver) return {nodata:true};
   let text=res.data; if(text==null){ text=cached.text; } else cachePut(res.ver,text);
   await gateDecrypt(JSON.parse(text),res.k);
-  const i=TRIAL.users.indexOf(n); GATE={user:n,role:res.r,idx:i<0?0:i,sw:!!res.sw,adm:!!res.adm,arch:res.arch||[],tok:res.token||null};
+  const i=TRIAL.users.indexOf(n); GATE={user:n,role:res.r,idx:i<0?0:i,sw:!!res.sw,adm:!!res.adm,arch:res.arch||[],tok:res.token||null,mp:res.mp||[],hv:res.hv||[],syncAt:res.syncAt||null};
   return {ok:true};
 }
 async function gateOpen(n,pw,remember){
@@ -1178,13 +1178,41 @@ window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); installEv
 ['#gateInstall','#appInstall'].forEach(x=>document.querySelector(x)?.addEventListener('click',async()=>{ if(!installEvt) return; installEvt.prompt(); await installEvt.userChoice; installEvt=null; ['#gateInstall','#appInstall'].forEach(y=>document.querySelector(y)?.classList.add('hide')); }));
 if('serviceWorker' in navigator && location.protocol==='https:' && document.querySelector('link[rel=manifest]')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
+/* סנכרון לילי: פרויקטים ממאסטר פלאן ושעות מהרבסט (קריאה בלבד) – מתמזגים לנתונים בכניסה */
+function mergeSync(){
+  if(!GATE) return;
+  const byIso=new Map(S.projects.map(p=>[String(p.iso_number||'').trim(),p]));
+  const staffBy=n=>{ if(!n) return null; n=String(n).replace(/^מהנדס(ת)?\s+/,'').trim(); return S.staff.find(s=>s.full_name===n)?.id||null; };
+  const clientBy=(id,name)=>{ if(!name) return null; let c=S.clients.find(c=>c.name===name); if(!c){ c={id:2000000+(+id||S.clients.length),name}; S.clients.push(c); } return c.id; };
+  let added=0, upd=0, he=0;
+  (GATE.mp||[]).forEach(([mid,iso,name,cid,cname,emp,st,act,ptype])=>{
+    const key=String(iso||'').trim(); if(!key) return;
+    let p=byIso.get(key);
+    if(p){ if(name) p.name=name; if(st) p.orig_status=st; if(act===false) p.status='גמר'; else if(p.status==='גמר') p.status='תכנון';
+      const e=staffBy(emp); if(e) p.responsible_engineer_id=e; const c=clientBy(cid,cname); if(c) p.client_id=c; upd++; }
+    else { p={id:1000000+mid, iso_number:key, name:name||'', client_id:clientBy(cid,cname), status:act===false?'גמר':'תכנון', responsible_engineer_id:staffBy(emp), project_type:ptype||'', orig_status:st||''};
+      S.projects.unshift(p); byIso.set(key,p); added++; }
+    if(/מוקפא/.test(`${p.iso_number} ${p.name} ${p.orig_status||''}`)) p.status='מוקפא';
+    if(p.id>=1000000 && /ארכיון/.test(p.iso_number)) p.archived=true;
+    delete p._s;
+  });
+  const idx=new Map(S.entries.map((e,i)=>[e.id,i]));
+  (GATE.hv||[]).forEach(([id,date,uname,code,hours,st,en,notes])=>{
+    const p=byIso.get(String(code||'').trim()); const sid=S.staff.find(s=>s.full_name===uname)?.id; if(!p||!sid) return;
+    const e={id,work_date:String(date).slice(0,10),staff_id:sid,project_id:p.id,hours:+hours,start_time:st||'',end_time:en||'',notes:notes||''};
+    if(idx.has(id)) S.entries[idx.get(id)]=e; else { idx.set(id,S.entries.length); S.entries.push(e); } he++;
+    let t=S.team.get(p.id); if(!t) S.team.set(p.id,t=new Set()); t.add(sid);
+  });
+  GATE.syncInfo={added,upd,he};
+}
+
 async function boot(){
   const demo = !SUPABASE_ANON_KEY || new URLSearchParams(location.search).has('demo');
   if(demo){
     const tB=performance.now();
     DB=demoDB; await DB.load(); $('#demoBar').classList.remove('hide');
-    if(REAL!==false && GATE){ localize(DB); const AS=new Set(GATE.arch); S.projects.forEach(p=>p.archived=AS.has(p.id));
-      $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (נכון ל-05.11.2026) · ללא נתונים כספיים · מה שמוסיפים או משנים נשמר רק במחשב הזה ולא בשרת · `; $('#demoRole').value=me.role; $('#demoRole').classList.toggle('hide',!GATE.sw); $('#demoRole').previousElementSibling.classList.toggle('hide',!GATE.sw); }
+    if(REAL!==false && GATE){ localize(DB); const AS=new Set(GATE.arch); S.projects.forEach(p=>p.archived=AS.has(p.id)); mergeSync();
+      $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (${GATE.syncAt?'מתעדכן כל לילה, עדכון אחרון '+new Date(GATE.syncAt).toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'נכון ל-05.11.2026'}) · ללא נתונים כספיים · מה שמוסיפים או משנים נשמר רק במחשב הזה ולא בשרת · `; $('#demoRole').value=me.role; $('#demoRole').classList.toggle('hide',!GATE.sw); $('#demoRole').previousElementSibling.classList.toggle('hide',!GATE.sw); }
     else if(REAL!==false){ makeReadOnly(DB);
       $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (נכון ל-05.11.2026) · ללא נתונים כספיים · קריאה בלבד, אין עדכונים · `; }
     const byName=n=>S.staff.find(x=>x.full_name===n)?.id;
