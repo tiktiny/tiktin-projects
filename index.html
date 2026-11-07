@@ -1,0 +1,1091 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROJECTS · טיקטין</title>
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --red:#d42a2f; --red-d:#a81f24; --orange:#f07a22;
+  --ink:#1f2328; --muted:#6b7280; --line:#d9dde3; --bg:#f4f5f7; --card:#ffffff;
+  --ok:#1f8a4c; --warn:#b45309; --h:36px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif;font-size:14px}
+button,input,select,textarea{font:inherit;color:inherit}
+header{background:#fff;border-bottom:3px solid var(--red);display:flex;align-items:center;gap:14px;padding:6px 16px;position:sticky;top:0;z-index:20}
+header img{height:46px}
+header .title{font-size:22px;font-weight:800;letter-spacing:2px;color:var(--red)}
+header .ver{font-size:11px;color:var(--muted)}
+header .sp{flex:1}
+header .user{font-size:13px;color:var(--muted)}
+.zoom{display:flex;align-items:center;gap:3px;border:1px solid var(--line);border-radius:8px;padding:2px}
+.zoom button{border:none;background:#fff;height:28px;min-width:28px;border-radius:6px;cursor:pointer;font-weight:700;font-size:15px}
+.zoom button:hover{background:#ffe9ea;color:var(--red)}
+.zoom button.on{background:var(--red);color:#fff}
+.zoom span{font-size:12px;min-width:40px;text-align:center;color:var(--muted)}
+body.fit main{max-width:none}
+nav.tabs{display:flex;gap:4px;padding:8px 16px 0;background:#fff;border-bottom:1px solid var(--line)}
+nav.tabs button{border:1px solid var(--line);border-bottom:none;background:#f7f7f8;padding:8px 18px;border-radius:8px 8px 0 0;cursor:pointer;font-weight:600}
+nav.tabs{position:sticky;top:61px;z-index:15}
+.selbar{background:#fff;border-bottom:1px solid var(--line);padding:6px 16px;display:flex;gap:8px;align-items:center;font-size:14px;position:sticky;top:104px;z-index:14}
+.selbar b{color:var(--red-d);font-size:15px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;min-height:var(--h);align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#f3f4f6;border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:13px}
+.chip button{border:none;background:none;cursor:pointer;color:#9aa0a6;padding:0;font-size:13px}
+.chip button:hover{color:var(--red)}
+#pScope.on{background:#fff5f5;border-color:var(--red);color:var(--red)}
+.ro{height:var(--h);display:flex;align-items:center;padding:0 10px;border:1px solid var(--line);border-radius:7px;background:#f7f7f8;font-variant-numeric:tabular-nums;font-weight:600}
+nav.tabs button[data-tab=clients]{margin-right:auto}
+.projshow{height:var(--h);display:flex;align-items:center;padding:0 10px;border:1px solid var(--line);border-radius:7px;background:#f7f7f8;font-weight:700;color:var(--red-d);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.projshow.none{color:var(--muted);font-weight:400}
+nav.tabs button.on{background:#fff;color:var(--red);border-color:var(--red);border-bottom:2px solid #fff;margin-bottom:-1px}
+main{padding:12px 16px 40px;max-width:1400px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.card h3{margin:0 0 10px;font-size:15px;color:var(--red-d)}
+.grid{display:grid;gap:8px 10px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));align-items:end}
+.grid .w2{grid-column:span 2}
+.grid .w3{grid-column:span 3}
+.grid .full{grid-column:1/-1}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g5{grid-template-columns:2fr 1fr 1fr 1fr 2fr}
+.g6{grid-template-columns:repeat(6,minmax(0,1fr))}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);justify-content:flex-end}
+.fld input.t24{direction:ltr;text-align:right;font-variant-numeric:tabular-nums}
+.fld input.bad{border-color:var(--red);background:#fff5f5}
+.fld{position:relative}
+.fld input,.fld select,.fld textarea{width:100%;height:var(--h);border:1px solid var(--line);border-radius:7px;background:#fff;padding:0 10px 0 28px}
+.fld textarea{height:64px;padding:6px 10px 6px 28px;resize:vertical}
+.fld select{padding-left:10px}
+.fld .x{position:absolute;left:6px;top:50%;transform:translateY(-50%);border:none;background:none;color:#9aa0a6;cursor:pointer;font-size:15px;line-height:1;padding:2px}
+.fld textarea+.x{top:14px}
+.fld .x:hover{color:var(--red)}
+input:focus,select:focus,textarea:focus{outline:2px solid #f5b7b9;border-color:var(--red)}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;min-height:var(--h)}
+.checks label{display:flex;gap:5px;align-items:center;font-size:13px;color:var(--ink)}
+.btn{height:var(--h);border:1px solid var(--line);background:#fff;border-radius:7px;padding:0 14px;cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{border-color:var(--red)}
+.btn.pri{background:var(--red);color:#fff;border-color:var(--red)}
+.btn.pri:hover{background:var(--red-d)}
+.btn.go{background:var(--ok);color:#fff;border-color:var(--ok);min-width:118px}
+.btn.stop{background:var(--orange);color:#fff;border-color:var(--orange);min-width:118px}
+.btn.sm{height:28px;padding:0 9px;font-size:12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar .sp{flex:1}
+.timer{font-size:22px;font-variant-numeric:tabular-nums;font-weight:700;min-width:88px;text-align:center;color:var(--orange);font-size:20px}
+.bar.nw{flex-wrap:nowrap;gap:6px}
+.fld input:disabled{background:#f3f4f6;color:#374151;cursor:not-allowed}
+.running{font-size:22px;color:var(--ok);font-weight:800;margin-right:12px}
+.running::before{content:'● ';color:var(--orange)}
+.plan{font-size:13px;color:var(--muted)}
+.clockbox{display:flex;align-items:center;gap:10px;min-height:var(--h)}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:auto}
+th,td{border-bottom:1px solid var(--line);padding:6px 6px;text-align:right;vertical-align:middle}
+th{background:#fafafa;position:sticky;top:0;font-weight:700;color:#374151}
+tr.click{cursor:pointer}
+th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
+th.sortable:hover{color:var(--red)}
+td.noprint{white-space:nowrap;width:1%}
+tr.click:hover td{background:#fff5f5}
+tr.sel td{background:#ffe9ea}
+.tblwrap{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.num{text-align:left;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill{display:inline-block;white-space:nowrap;padding:1px 8px;border-radius:20px;font-size:12px;background:#eef0f3}
+.st-תכנון{background:#e0ecff}.st-מכרז{background:#fff1d6}.st-ביצוע{background:#dcf5e5}.st-גמר{background:#e5e7eb}.st-בוטל{background:#fde2e2}.st-טרם{background:#f3f4f6}
+details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px 0}
+.money{border:1px dashed var(--red);border-radius:10px;padding:10px;background:#fffafa}
+.money h4{margin:0 0 8px;color:var(--red-d);font-size:14px}
+.muted{color:var(--muted)}
+.tot{font-weight:700}
+.hide{display:none!important}
+#login,#gate{min-height:100vh;display:flex;align-items:center;justify-content:center}
+#gate .box,#login .box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:30px 34px;text-align:center;width:min(420px,92vw)}
+#login img,#gate img{height:70px}
+#login h1,#gate h1{color:var(--red);letter-spacing:4px;margin:10px 0 18px}
+#login .btn,#gate .btn{width:100%;margin-top:8px}
+#gate select{width:100%;height:var(--h);border:1px solid var(--line);border-radius:7px;background:#fff;padding:0 10px;margin-top:12px}
+#gate .fld{margin-top:8px}
+#gate label.rem{display:flex;gap:6px;align-items:center;justify-content:flex-start;font-size:13px;margin-top:10px}
+#gateErr{color:var(--red);font-size:13px;min-height:18px;margin-top:6px}
+#toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:8px 16px;border-radius:8px;opacity:0;transition:.3s;z-index:50}
+#toast.on{opacity:.92}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:60}
+#modal .mbox{background:#fff;border-radius:12px;padding:22px 26px;max-width:460px;width:92vw;text-align:center;font-size:15px;line-height:1.5;border-top:4px solid var(--red)}
+.demo{background:#fff7e6;border:1px solid #f5c26b;border-radius:8px;padding:6px 10px;font-size:12px;margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media (max-width:700px){
+  header img{height:34px} header .title{font-size:17px}
+  .grid,.g4,.g5,.g6{grid-template-columns:1fr 1fr} .grid .w2,.grid .w3,.grid .m-full{grid-column:1/-1}
+  main{padding:10px}
+  .hide-m{display:none}
+}
+@media print{header,nav.tabs,.bar,.demo,.noprint{display:none!important} .tblwrap{max-height:none;border:none}}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="login" class="hide">
+  <div class="box">
+    <img src="logo.png" alt="טיקטין">
+    <h1>PROJECTS</h1>
+    <button class="btn pri" id="btnMs">כניסה עם חשבון טיקטין (Microsoft)</button>
+    <div class="muted" style="margin:14px 0 4px;font-size:12px">או קבלת קישור כניסה למייל</div>
+    <div class="fld"><input id="loginEmail" type="email" placeholder="name@tiktin.com"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+    <button class="btn" id="btnMagic">שלח לי קישור כניסה</button>
+    <div class="muted" style="margin-top:14px;font-size:11px" id="loginVer"></div>
+  </div>
+</div>
+
+<div id="gate" class="hide">
+  <div class="box">
+    <img src="logo.png" alt="טיקטין">
+    <h1>PROJECTS</h1>
+    <div class="muted" style="font-size:13px">גרסת התנסות – כניסה עם סיסמה אישית</div>
+    <select id="gateUser" title="בחירת שם המשתמש"><option value="">מי נכנס/ת?</option></select>
+    <div class="fld"><input id="gatePw" type="password" placeholder="סיסמה" autocomplete="current-password" title="הסיסמה האישית שקיבלת במייל"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+    <label class="rem" title="בפעם הבאה התוכנה תיפתח במחשב הזה בלי להקליד סיסמה"><input type="checkbox" id="gateRem" checked> זכור אותי במחשב הזה</label>
+    <div class="hide" id="gateUp" style="margin-top:8px;font-size:12px;text-align:right">קובץ הנתונים המוצפן (PROJECTS-data.json מתיקיית ההורדות):<br><input type="file" id="gateFile" accept=".json" title="בחירת קובץ הנתונים המוצפן להעלאה לשרת – פעם אחת"></div>
+    <div id="gateErr"></div>
+    <button class="btn pri" id="gateGo">כניסה</button>
+    <button class="btn hide" id="gateInstall" title="התקנת PROJECTS כאפליקציה במחשב – אייקון בשולחן העבודה ופתיחה בחלון נפרד">התקנה כאפליקציה במחשב</button>
+    <div class="muted" style="margin-top:14px;font-size:11px" id="gateVer"></div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app" class="hide">
+<header>
+  <img src="logo.png" alt="טיקטין">
+  <div>
+    <div class="title">PROJECTS</div>
+    <div class="ver" id="ver"></div>
+  </div>
+  <div class="sp"></div>
+  <div class="zoom noprint">
+    <button id="zOut" title="הקטנת התצוגה">−</button>
+    <span id="zVal" title="גודל התצוגה – לחיצה מחזירה ל-100%">100%</span>
+    <button id="zIn" title="הגדלת התצוגה">+</button>
+    <button id="zFit" title="התאמה למסך – התצוגה ממלאת את כל רוחב המסך ומתעדכנת כשמשנים את גודל החלון">⤢</button>
+  </div>
+  <span class="user" id="who"></span>
+  <button class="btn sm" id="btnOut" title="יציאה מהמערכת">יציאה</button>
+</header>
+<nav class="tabs">
+  <button data-tab="projects" class="on">פרויקטים</button>
+  <button data-tab="hours">שעות</button>
+  <button data-tab="card">כרטיס פרויקט</button>
+  <button data-tab="money" id="tabMoney">כספים</button>
+  <button data-tab="reports">דוחות</button>
+  <button data-tab="clients">לקוחות ואלפון</button>
+</nav>
+<div class="selbar" id="selBar"><span class="muted">פרויקט נבחר:</span> <b id="selName">לא נבחר פרויקט – בחר בלשונית "פרויקטים"</b><button class="btn sm hide" id="selClear" title="ביטול בחירת הפרויקט">✕</button></div>
+
+<main>
+  <div class="demo hide" id="demoBar">
+    <b>מצב הדגמה</b> – נתונים לדוגמה, שום דבר לא נשמר בשרת.
+    <span>הצג כ:</span>
+    <select id="demoRole"><option value="management">הנהלה</option><option value="finance">מזכירות וכספים</option><option value="team_lead">ראש צוות</option><option value="employee">עובד</option></select>
+    <button class="btn sm hide" id="demoReset" title="מחיקת כל מה שהוספת או שינית בהתנסות במחשב הזה – חזרה לנתונים המקוריים">ביטול השינויים שלי</button>
+    <button class="btn sm hide" id="appInstall" title="התקנת PROJECTS כאפליקציה במחשב – אייקון בשולחן העבודה ופתיחה בחלון נפרד">התקנה במחשב</button>
+  </div>
+
+  <!-- ===== PROJECTS ===== -->
+  <section id="tab-projects">
+    <div class="card">
+      <div class="bar">
+        <div class="fld" style="flex:2;min-width:220px"><input id="pSearch" placeholder="חיפוש לפי מספר ISO, שם, לקוח או חברת ניהול"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        <div class="fld" style="flex:1;min-width:140px"><select id="pStatusF"><option value="">כל הסטטוסים</option></select></div>
+        <button class="btn" id="pScope" title="מעבר בין הפרויקטים שלך לכל הפרויקטים במשרד">הצג את כל הפרויקטים</button>
+        <button class="btn pri" id="pNew" title="פתיחת כרטיס פרויקט חדש">+ פרויקט חדש</button>
+      </div>
+      <div class="tblwrap" style="margin-top:8px"><table id="pTable"></table></div>
+      <div class="bar" style="margin-top:8px"><span class="muted" id="pCount"></span><div class="sp"></div>
+        <button class="btn" data-exp="xlsx" data-t="pTable">Excel</button>
+        <button class="btn" data-exp="doc" data-t="pTable">Word</button>
+        <button class="btn" data-exp="pdf" data-t="pTable">PDF</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== HOURS ===== -->
+  <section id="tab-hours" class="hide">
+    <div class="card">
+      <h3>1. דיווח שעות<span class="running hide" id="hRunning"></span></h3>
+      <div class="grid g5">
+        <div class="f m-full"><span style="font-size:12px;color:var(--muted)">פרויקט (נבחר בלשונית "פרויקטים")</span>
+          <div class="projshow none" id="hProject" title="לבחירת פרויקט אחר עבור ללשונית פרויקטים">לא נבחר פרויקט</div>
+        </div>
+        <label class="f">תאריך
+          <div class="fld"><input id="hDate" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        </label>
+        <label class="f">שעת התחלה · 24 שעות
+          <div class="fld"><input id="hStart" class="t24" placeholder="00:00" inputmode="numeric" maxlength="5"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        </label>
+        <label class="f">שעת סיום · 24 שעות
+          <div class="fld"><input id="hEnd" class="t24" placeholder="00:00" inputmode="numeric" maxlength="5"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        </label>
+        <label class="f">הערה
+          <div class="fld"><input id="hNotes" placeholder="מה עשית (לא חובה)"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        </label>
+        <div class="bar nw m-full">
+          <button class="btn pri" id="hAdd" title="שמירת דיווח עם התאריך והשעות שבחרת">שמור דיווח</button>
+          <button class="btn go" id="hTimer" title="התחלת מדידת זמן עכשיו לפרויקט שנבחר">▶ התחל עבודה</button>
+          <span class="timer hide" id="hClock" title="זמן העבודה מתחילת המדידה">00:00:00</span>
+        </div>
+        <label class="f">סיום אוטומטי בשעה · 24 שעות
+          <div class="fld"><input id="hAutoAt" class="t24" placeholder="00:00" inputmode="numeric" maxlength="5" title="המדידה תיעצר ותישמר אוטומטית בשעה הזו – בפורמט 24 שעות"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        </label>
+        <label class="f">או בעוד – שעות
+          <div class="fld"><input id="hAutoH" type="number" min="0" max="24" step="1" inputmode="numeric" placeholder="00" title="כמה שעות מעכשיו לעצור"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        </label>
+        <label class="f">דקות
+          <div class="fld"><input id="hAutoM" type="number" min="0" max="59" step="5" inputmode="numeric" placeholder="00" title="כמה דקות מעכשיו לעצור"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        </label>
+        <div class="clockbox">
+          <span class="plan" id="hPlan"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="bar" style="margin-bottom:8px">
+        <h3 style="margin:0">2. הדיווחים שלי</h3>
+        <div class="sp"></div>
+        <label class="f" id="hWhoWrap">עובד
+          <div class="fld"><select id="hWho"></select></div></label>
+        <label class="f">מתאריך<div class="fld"><input id="hFrom" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f">עד תאריך<div class="fld"><input id="hTo" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+      </div>
+      <div class="tblwrap"><table id="hTable"></table></div>
+      <div class="bar" style="margin-top:8px">
+        <span class="tot" id="hTotal"></span><div class="sp"></div>
+        <button class="btn" data-reset="hours" title="איפוס כל השדות והסינונים">איפוס טופס</button>
+        <button class="btn" data-exp="xlsx" data-t="hTable" title="ייצוא הטבלה לאקסל">Excel</button>
+        <button class="btn" data-exp="doc" data-t="hTable" title="ייצוא הטבלה לוורד">Word</button>
+        <button class="btn" data-exp="pdf" data-t="hTable" title="הדפסה / שמירה כ-PDF">PDF</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROJECT CARD ===== -->
+  <section id="tab-card" class="hide">
+    <div class="card empty" id="cardEmpty">לא נבחר פרויקט. בחר פרויקט בלשונית "פרויקטים", או לחץ "פרויקט חדש".</div>
+    <div class="card hide" id="pCard">
+      <h3 id="pCardTitle">כרטיס פרויקט</h3>
+      <div class="muted hide" id="lockNote" style="font-size:12px;margin:-4px 0 8px">🔒 מספר ISO, שם הפרויקט והלקוח מגיעים ממאסטר פלאן – רק הנהלה יכולה לשנות אותם. אפשר להוסיף "שם נוסף לזיהוי".</div>
+      <div class="grid g4">
+        <label class="f">מספר ISO<div class="fld"><input id="p_iso" class="lockable"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f w3">שם הפרויקט (מקורי)<div class="fld"><input id="p_name" class="lockable"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f w2">שם נוסף לזיהוי הפרויקט<div class="fld"><input id="p_alias" placeholder="לדוגמה: מגדלי הים בת ים, בניין A"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f w2">לקוח / יזם<div class="fld"><input id="p_client" class="lockable" list="clientList"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f">סטטוס<div class="fld"><select id="p_status"></select></div></label>
+        <label class="f">תוכנת ניהול פרויקטים<div class="fld"><input id="p_pm_software" list="pmSoftList" placeholder="בחר מהרשימה או כתוב"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f w2">חברת ניהול פרויקטים<div class="fld"><input id="p_pm_company"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f w2">מהנדס אחראי / ראש צוות (טיקטין)<div class="fld"><select id="p_engineer"></select></div></label>
+        <label class="f">מתכנן רשת – חברת חשמל<div class="fld"><input id="p_iec_planner" placeholder="שם + טלפון"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f">חל"ב – חברת חשמל<div class="fld"><input id="p_iec_halav" placeholder="שם + טלפון"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <div class="f full"><span class="muted" style="font-size:12px">העתקות תשתיות נדרשות</span>
+          <div class="checks">
+            <label><input type="checkbox" id="p_reloc_electric">חשמל</label>
+            <label><input type="checkbox" id="p_reloc_bezeq">בזק</label>
+            <label><input type="checkbox" id="p_reloc_hot">הוט</label>
+            <label><input type="checkbox" id="p_reloc_cellcom">סלקום</label>
+            <label><input type="checkbox" id="p_reloc_partner">פרטנר</label>
+            <label><input type="checkbox" id="p_reloc_unlimited">אנלימיטד</label>
+          </div>
+        </div>
+        <label class="f full">הערות<div class="fld"><textarea id="p_notes"></textarea><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <div class="f full"><span class="muted" style="font-size:12px">צוות הפרויקט</span>
+          <div class="chips" id="teamChips"></div>
+        </div>
+        <div class="bar full" id="teamAdd">
+          <div class="fld" style="min-width:240px"><select id="teamSel"></select></div>
+          <button class="btn" id="teamAddBtn" title="הוספת העובד לצוות הפרויקט">+ הוסף לצוות</button>
+        </div>
+      </div>
+
+      <div class="bar" style="margin-top:12px">
+        <button class="btn pri" id="pSave" title="שמירת כרטיס הפרויקט">שמור</button>
+        <button class="btn" data-reset="project" title="ניקוי כל שדות הכרטיס">איפוס טופס</button>
+        <div class="sp"></div>
+        <button class="btn" data-exp="xlsx" data-t="pCard">Excel</button>
+        <button class="btn" data-exp="doc" data-t="pCard">Word</button>
+        <button class="btn" data-exp="pdf" data-t="pCard">PDF</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MONEY ===== -->
+  <section id="tab-money" class="hide">
+    <div class="card" id="moneyAll">
+      <div class="bar" style="margin-bottom:8px"><h3 style="margin:0">סיכום כספים – כל הפרויקטים</h3><div class="sp"></div>
+        <div class="fld" style="min-width:260px"><input id="mSearch" placeholder="חיפוש לפי מספר ISO, שם או לקוח"><button class="x" tabindex="-1" title="נקה">✕</button></div></div>
+      <div class="tblwrap" style="max-height:520px"><table id="mTable"></table></div>
+      <div class="bar" style="margin-top:8px"><span class="muted" id="mCount"></span><div class="sp"></div>
+        <button class="btn" data-exp="xlsx" data-t="mTable">Excel</button><button class="btn" data-exp="doc" data-t="mTable">Word</button><button class="btn" data-exp="pdf" data-t="mTable">PDF</button></div>
+    </div>
+    <div class="card empty hide" id="moneyEmpty"></div>
+    <div class="card hide" id="moneyCard">
+      <div class="money" id="pMoney">
+        <h4><span id="moneyTitle">כספים</span> <span class="muted" style="font-weight:400;font-size:12px">– נתונים ממאסטר פלאן, לצפייה בלבד · מוצג להנהלה ולמזכירות וכספים</span></h4>
+        <div class="grid g4">
+          <div class="f"><span class="muted" style="font-size:12px">שכ"ט (₪)</span><div class="ro" id="f_base"></div></div>
+          <div class="f"><span class="muted" style="font-size:12px">סה"כ הוגש (₪)</span><div class="ro" id="f_sub"></div></div>
+          <div class="f"><span class="muted" style="font-size:12px">סה"כ שולם (₪)</span><div class="ro" id="f_paid"></div></div>
+          <div class="f"><span class="muted" style="font-size:12px">יתרה לגבייה (₪)</span><div class="ro tot" id="f_total"></div></div>
+        </div>
+        <h4 style="margin-top:12px">חשבונות שהוגשו <span class="muted" id="bSum" style="font-weight:400;font-size:12px"></span></h4>
+        <div class="tblwrap" style="max-height:340px"><table id="bTable"></table></div>
+      </div>
+
+      <div class="bar" style="margin-top:12px">
+        <div class="sp"></div>
+        <button class="btn" data-exp="xlsx" data-t="bTable">Excel</button>
+        <button class="btn" data-exp="doc" data-t="bTable">Word</button>
+        <button class="btn" data-exp="pdf" data-t="bTable">PDF</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== REPORTS ===== -->
+  <section id="tab-reports" class="hide">
+    <div class="card">
+      <h3>דוחות שעות</h3>
+      <div class="grid g4">
+        <label class="f w2">סוג דוח<div class="fld"><select id="rType">
+          <option value="projEmp">שעות בפרויקט הנבחר – לפי עובד</option>
+          <option value="projMonth">שעות בפרויקט הנבחר – לפי חודש</option>
+          <option value="projList">שעות בפרויקט הנבחר – כל הדיווחים</option>
+          <option value="empSum">שעות לפי עובד (כל הפרויקטים)</option>
+          <option value="projSum">שעות לפי פרויקט (כל העובדים)</option>
+        </select></div></label>
+        <label class="f">מתאריך<div class="fld"><input id="rFrom" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f">עד תאריך<div class="fld"><input id="rTo" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+      </div>
+      <div class="tblwrap" style="margin-top:10px;max-height:520px"><table id="rTable"></table></div>
+      <div class="bar" style="margin-top:8px">
+        <span class="tot" id="rTotal"></span><div class="sp"></div>
+        <button class="btn" data-reset="reports" title="איפוס סוג הדוח והתאריכים">איפוס טופס</button>
+        <button class="btn" data-exp="xlsx" data-t="rTable">Excel</button>
+        <button class="btn" data-exp="doc" data-t="rTable">Word</button>
+        <button class="btn" data-exp="pdf" data-t="rTable">PDF</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CLIENTS ===== -->
+  <section id="tab-clients" class="hide">
+    <div class="card">
+      <div class="bar">
+        <div class="fld" style="flex:2;min-width:220px"><input id="cSearch" placeholder="חיפוש לקוח או איש קשר (שם, טלפון, מייל)"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        <button class="btn pri" id="cNew">+ לקוח חדש</button>
+        <button class="btn pri" id="kNew">+ איש קשר חדש</button>
+      </div>
+      <div class="tblwrap" style="margin-top:8px"><table id="cTable"></table></div>
+      <div class="bar" style="margin-top:8px"><span class="muted" id="cCount"></span><div class="sp"></div>
+        <button class="btn" data-exp="xlsx" data-t="cTable">Excel</button>
+        <button class="btn" data-exp="doc" data-t="cTable">Word</button>
+        <button class="btn" data-exp="pdf" data-t="cTable">PDF</button>
+      </div>
+    </div>
+    <div class="card hide" id="kCard">
+      <h3 id="kCardTitle">איש קשר</h3>
+      <div class="grid g4">
+        <label class="f w2">שם מלא<div class="fld"><input id="k_name"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f w2">חברה / לקוח<div class="fld"><input id="k_client" list="clientList"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f w2">תפקיד<div class="fld"><input id="k_title"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f">נייד<div class="fld"><input id="k_mobile" inputmode="tel"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f">טלפון<div class="fld"><input id="k_phone" inputmode="tel"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f w2">מייל<div class="fld"><input id="k_email" type="email"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+        <label class="f full">הערות<div class="fld"><textarea id="k_notes"></textarea><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
+      </div>
+      <div class="bar" style="margin-top:10px">
+        <button class="btn pri" id="kSave">שמור</button>
+        <button class="btn" data-reset="contact">איפוס טופס</button>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+
+<datalist id="projList"></datalist>
+<datalist id="clientList"></datalist>
+<datalist id="pmSoftList"></datalist>
+<div id="toast"></div>
+<div id="modal" class="hide"><div class="mbox"><div id="modalText"></div><div class="bar" id="modalBtns" style="justify-content:center;margin-top:16px"></div></div></div>
+
+<script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל"]}</script>
+<script>
+/* ================= CONFIG ================= */
+const VERSION = '0.16';
+const VERSION_DATE = '07.11.2026';
+/* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
+const FIN_OFF = true;
+const SUPABASE_URL = 'https://wiwdszhdjnzyrbxxakbm.supabase.co';
+const SUPABASE_ANON_KEY = '';   // ימולא בהמשך
+const STATUSES = ['טרם התחיל','תכנון','מכרז','ביצוע','גמר','בוטל'];
+const PM_SOFTWARE = ['','זיו','VPLANS','רמדור','אספונט','SHAPEDO','BIM360','אחר'];
+const ROLE_HE = {management:'הנהלה',finance:'מזכירות וכספים',team_lead:'ראש צוות',employee:'עובד'};
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => (s??'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtMoney = n => n==null||n===''||+n===0?'—':'₪ '+Number(n).toLocaleString('he-IL',{maximumFractionDigits:0});
+const today = () => { const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+const toast = m => {const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200)};
+/* render big tables in chunks so typing stays fast */
+const JOBS={};
+function chunkRender(id,head,rows,rowFn){
+  const t=$('#'+id); clearTimeout(JOBS[id]);
+  t.innerHTML=head+'<tbody>'+rows.slice(0,150).map(rowFn).join('')+'</tbody>';
+  const tb=t.tBodies[0]; let i=150;
+  const step=()=>{ if(i>=rows.length) return; tb.insertAdjacentHTML('beforeend',rows.slice(i,i+600).map(rowFn).join('')); i+=600; JOBS[id]=setTimeout(step,0); };
+  JOBS[id]=setTimeout(step,30);
+}
+const debounce=(f,ms)=>{ let h; return (...a)=>{ clearTimeout(h); h=setTimeout(()=>f(...a),ms); }; };
+const hrs = (s,e)=>{ if(!s||!e) return null; const [a,b]=s.split(':').map(Number),[c,d]=e.split(':').map(Number); let m=(c*60+d)-(a*60+b); if(m<0)m+=1440; return Math.round(m/6)/10; };
+
+/* ================= DATA LAYER ================= */
+let me = null;              // {staff_id, name, role, email}
+let DB;                     // implementation
+const S = {staff:[],clients:[],contacts:[],projects:[],entries:[],finance:{},incr:[]};
+
+const RO = ()=>{ toast('מצב הדגמה – קריאה בלבד, לא ניתן לעדכן כרגע'); throw 'RO'; };
+window.addEventListener('unhandledrejection',e=>{ if(e.reason==='RO') e.preventDefault(); });
+let REAL=false;
+function loadReal(){
+  const el=document.getElementById('demoData'); if(!el) return false;
+  const t0=performance.now(); const d=JSON.parse(el.textContent);
+  S.staff=d.staff.map(r=>({id:r[0],full_name:r[1],email:r[2],active:!!r[3]}));
+  S.clients=d.clients.map(r=>({id:r[0],name:r[1],phone:r[2],email:r[3],city:r[4]}));
+  S.projects=d.projects.map(r=>({id:r[0],iso_number:r[1],name:r[2],client_id:r[3],status:r[4],responsible_engineer_id:r[5],project_type:r[6],orig_status:r[7]})).sort((a,b)=>(parseInt(b.iso_number)||0)-(parseInt(a.iso_number)||0));
+  S.contacts=d.contacts.map(r=>({id:r[0],full_name:r[1],client_id:r[2],email:r[3],phone:r[4],mobile:r[5]}));
+  S.entries=d.entries.map(r=>({id:r[0],work_date:r[1],staff_id:r[2],project_id:r[3],hours:r[4],start_time:r[5]||'',end_time:r[6]||'',notes:r[7]}));
+  S.team=new Map(); const addT=(p,s)=>{ if(!p||!s) return; let t=S.team.get(p); if(!t) S.team.set(p,t=new Set()); t.add(s); };
+  S.entries.forEach(e=>addT(e.project_id,e.staff_id)); S.projects.forEach(p=>addT(p.id,p.responsible_engineer_id));
+  S.finance={}; S.incr=[]; S.bills=[];
+  const fe=FIN_OFF?null:document.getElementById('demoFinance');
+  if(fe){ const F=JSON.parse(fe.textContent); F.finance.forEach(r=>S.finance[r[0]]={base_fee:r[1],submitted_total:r[2],paid_total:r[3]}); S.bills=F.bills.map(r=>({project_id:r[0],num:r[1],sum:r[2],date:r[3],status:r[4],approved:r[5]})); }
+  const y=S.staff.find(x=>x.full_name==='יובל טיקטין');
+  me={staff_id:y?.id,name:'יובל טיקטין',role:'management',email:'yuval@tiktin.com'};
+  if(GATE){ const full={'ליטל':'ליטל סרור','יובל':'יובל טיקטין'}[GATE.user];
+    let st=S.staff.find(x=>full ? x.full_name===full : (x.full_name===GATE.user || x.full_name.startsWith(GATE.user+' ')) && x.active);
+    if(!st){ st={id:990000+GATE.idx,full_name:GATE.user,email:'',active:true}; S.staff.push(st); }
+    me={staff_id:st.id,name:st.full_name,role:GATE.role,email:''}; }
+  REAL=Math.round(performance.now()-t0); return true;
+}
+const demoDB = {
+  async load(){
+    if(loadReal()) return;
+    S.staff=[{id:1,full_name:'יובל טיקטין',email:'yuval@tiktin.com'},{id:2,full_name:'נדב טיקטין',email:'nadav@tiktin.com'},{id:3,full_name:'ליטל דוד',email:'lital@tiktin.com',team_lead:2},{id:4,full_name:'מיכל ויסברגר',email:'michalw@tiktin.com',team_lead:3}];
+    S.clients=[{id:1,name:'ויקטורי'},{id:2,name:'אשטרום'},{id:3,name:'אאורה ישראל'},{id:4,name:'קן התור'},{id:5,name:'רמי שבירו'}];
+    S.contacts=[{id:1,client_id:2,full_name:'דוגמה – מנהל פרויקט',title:'מנהל פרויקט',mobile:'050-0000000',email:'pm@example.co.il'},{id:2,client_id:5,full_name:'דוגמה – מהנדס ביצוע',title:'מהנדס ביצוע',mobile:'052-0000000',email:'eng@example.co.il'}];
+    S.projects=[
+      {id:1,iso_number:'12062',name:'תל מונד - תכנון פנים ויקטורי תל מונד',client_id:1,status:'תכנון',pm_company:'',pm_software:'BIM360',responsible_engineer_id:1,reloc_electric:false},
+      {id:2,iso_number:'10271',name:'רמת גן - שיכון הרופאים תל השומר חלק ב\'',client_id:2,status:'ביצוע',pm_company:'דוגמה ניהול פרויקטים',pm_software:'זיו',responsible_engineer_id:2,reloc_electric:true,reloc_bezeq:true},
+      {id:3,iso_number:'9842',name:'רמה"ש - מתחם אילת שלב ב\'',client_id:3,status:'מכרז',pm_software:'רמדור',responsible_engineer_id:3},
+      {id:4,iso_number:'12084',name:'נתניה - בלו קליף רח\' ניצה 30',client_id:4,status:'טרם התחיל',responsible_engineer_id:2}];
+    S.entries=[{id:1,staff_id:1,project_id:1,work_date:today(),start_time:'08:30',end_time:'11:00',hours:2.5,notes:'תכנון תאורה'},{id:2,staff_id:3,project_id:2,work_date:today(),start_time:'09:00',end_time:'13:30',hours:4.5,notes:''},{id:3,staff_id:4,project_id:3,work_date:today(),start_time:'10:00',end_time:'12:00',hours:2,notes:''}];
+    S.finance={}; S.incr=[];
+    me={staff_id:1,name:'יובל טיקטין',role:'management',email:'yuval@tiktin.com'};
+  },
+  async saveEntry(e){ if(e.id){Object.assign(S.entries.find(x=>x.id===e.id),e)} else {e.id=Date.now();S.entries.push(e)} e.hours=e.hours??hrs(e.start_time,e.end_time); return e; },
+  async delEntry(id){ S.entries=S.entries.filter(x=>x.id!==id) },
+  async saveProject(p){ if(p.id){Object.assign(S.projects.find(x=>x.id===p.id),p)} else {p.id=Date.now();S.projects.push(p)} return p; },
+  async saveFinance(pid,f){ S.finance[pid]=f },
+  async saveIncr(i){ i.id=Date.now(); S.incr.push(i); return i },
+  async delIncr(id){ S.incr=S.incr.filter(x=>x.id!==id) },
+  async saveClient(c){ c.id=Date.now(); S.clients.push(c); return c },
+  async saveContact(k){ if(k.id){Object.assign(S.contacts.find(x=>x.id===k.id),k)} else {k.id=Date.now();S.contacts.push(k)} return k },
+  async teamAdd(p,s){ let t=S.team.get(p); if(!t) S.team.set(p,t=new Set()); t.add(s); },
+  async teamRemove(p,s){ S.team.get(p)?.delete(s); },
+  async signOut(){ location.reload() }
+};
+
+function makeReadOnly(db){ ['saveEntry','delEntry','saveProject','saveFinance','saveIncr','delIncr','saveClient','saveContact','teamAdd','teamRemove'].forEach(k=>db[k]=async()=>RO()); }
+function sbDB(sb){
+  const chk = r => { if(r.error){ toast('שגיאה: '+r.error.message); throw r.error } return r.data };
+  return {
+    async load(){
+      const {data:{user}} = await sb.auth.getUser();
+      const prof = chk(await sb.from('profiles').select('*').eq('id',user.id).single());
+      S.staff = chk(await sb.from('staff').select('id,full_name,email,profile_id').eq('active',true).order('full_name'));
+      const st = S.staff.find(s=>s.profile_id===user.id);
+      me = {staff_id:st?.id,name:prof.full_name||user.email,role:prof.role,email:user.email};
+      S.clients = chk(await sb.from('clients').select('*').order('name'));
+      S.contacts = chk(await sb.from('contacts').select('*').order('full_name'));
+      S.projects = chk(await sb.from('projects').select('*').order('iso_number',{ascending:false}));
+      S.team=new Map(); (chk(await sb.from('project_team').select('project_id,staff_id'))).forEach(r=>{ let t=S.team.get(r.project_id); if(!t) S.team.set(r.project_id,t=new Set()); t.add(r.staff_id); });
+      S.entries = chk(await sb.from('time_entries').select('*').gte('work_date', new Date(Date.now()-62*864e5).toISOString().slice(0,10)));
+      if(!FIN_OFF && ['management','finance'].includes(me.role)){
+        (chk(await sb.from('project_finance').select('*'))).forEach(f=>S.finance[f.project_id]=f);
+        S.incr = chk(await sb.from('fee_increases').select('*'));
+      }
+    },
+    async saveEntry(e){ const r = e.id ? await sb.from('time_entries').update(e).eq('id',e.id).select().single() : await sb.from('time_entries').insert(e).select().single(); const d=chk(r); const i=S.entries.findIndex(x=>x.id===d.id); i>=0?S.entries[i]=d:S.entries.push(d); return d; },
+    async delEntry(id){ chk(await sb.from('time_entries').delete().eq('id',id)); S.entries=S.entries.filter(x=>x.id!==id) },
+    async saveProject(p){ const r = p.id ? await sb.from('projects').update(p).eq('id',p.id).select().single() : await sb.from('projects').insert(p).select().single(); const d=chk(r); const i=S.projects.findIndex(x=>x.id===d.id); i>=0?S.projects[i]=d:S.projects.unshift(d); return d; },
+    async saveFinance(pid,f){ chk(await sb.from('project_finance').upsert({project_id:pid,...f})); S.finance[pid]=f },
+    async saveIncr(i){ const d=chk(await sb.from('fee_increases').insert(i).select().single()); S.incr.push(d); return d },
+    async delIncr(id){ chk(await sb.from('fee_increases').delete().eq('id',id)); S.incr=S.incr.filter(x=>x.id!==id) },
+    async saveClient(c){ const d=chk(await sb.from('clients').insert(c).select().single()); S.clients.push(d); return d },
+    async saveContact(k){ const r = k.id ? await sb.from('contacts').update(k).eq('id',k.id).select().single() : await sb.from('contacts').insert(k).select().single(); const d=chk(r); const i=S.contacts.findIndex(x=>x.id===d.id); i>=0?S.contacts[i]=d:S.contacts.push(d); return d },
+    async teamAdd(p,s){ chk(await sb.from('project_team').insert({project_id:p,staff_id:s})); let t=S.team.get(p); if(!t) S.team.set(p,t=new Set()); t.add(s); },
+    async teamRemove(p,s){ chk(await sb.from('project_team').delete().eq('project_id',p).eq('staff_id',s)); S.team.get(p)?.delete(s); },
+    async signOut(){ await sb.auth.signOut(); location.reload() }
+  };
+}
+
+/* ================= HELPERS ================= */
+const isFin = () => ['management','finance'].includes(me.role);
+const isMgmt = () => me.role==='management';
+const projLabel = p => p ? `${p.iso_number||''} – ${p.name}`+(p.alias?` (${p.alias})`:'') : '';
+const IX={p:new Map(),c:new Map(),s:new Map(),lbl:new Map()};
+function reindex(){ IX.p=new Map(S.projects.map(p=>[p.id,p])); IX.c=new Map(S.clients.map(c=>[c.id,c])); IX.s=new Map(S.staff.map(s=>[s.id,s])); IX.lbl=new Map(); S.projects.forEach(p=>{ IX.lbl.set(projLabel(p),p); if(p.iso_number && !IX.lbl.has(p.iso_number.trim())) IX.lbl.set(p.iso_number.trim(),p); }); }
+const projById = id => IX.p.get(id);
+const projByLabel = v => IX.lbl.get(v) || IX.lbl.get((v||'').trim());
+const clientName = id => IX.c.get(id)?.name||'';
+const clientByName = n => S.clients.find(c=>c.name===n.trim());
+const staffName = id => IX.s.get(id)?.full_name||'';
+const visibleStaff = () => {
+  if(isMgmt()) return S.staff;
+  if(me.role==='team_lead') return S.staff.filter(s=>s.id===me.staff_id || s.team_lead===me.staff_id || s.team_lead_profile===me.staff_id);
+  return S.staff.filter(s=>s.id===me.staff_id);
+};
+function fillDatalists(){
+  reindex();
+  $('#projList').innerHTML = S.projects.filter(p=>p.status!=='בוטל' && p.status!=='גמר').map(p=>`<option value="${esc(projLabel(p))}">`).join('');
+  $('#clientList').innerHTML = S.clients.map(c=>`<option value="${esc(c.name)}">`).join('');
+}
+
+/* inputs: X clear buttons + first keystroke overwrites */
+function wireInputs(root=document){
+  root.querySelectorAll('input.t24').forEach(i=>{ if(i._t) return; i._t=1; });
+  root.querySelectorAll('.fld .x').forEach(b=>{ if(b._w) return; b._w=1;
+    b.addEventListener('click',()=>{ const i=b.previousElementSibling; i.value=''; i.dispatchEvent(new Event('input',{bubbles:true})); i.dispatchEvent(new Event('change',{bubbles:true})); i.focus(); }); });
+  root.querySelectorAll('.fld input:not([type=date]):not([type=time]):not([type=checkbox]), .fld textarea').forEach(i=>{ if(i._w) return; i._w=1;
+    i.addEventListener('focus',()=>setTimeout(()=>{ try{i.select()}catch(e){} },0)); });
+}
+
+/* 24h time fields: accept 1600 / 16 / 9:5 → HH:MM */
+function norm24(v){ v=(v||'').trim(); if(!v) return ''; let m=v.match(/^(\d{1,2})[:.\s]?(\d{0,2})$/); if(!m) return null;
+  let H=+m[1], M=m[2]===''?0:+m[2]; if(m[2].length===1) M=M*10; if(H>23||M>59) return null; return String(H).padStart(2,'0')+':'+String(M).padStart(2,'0'); }
+document.addEventListener('input',e=>{ const i=e.target; if(!i.classList||!i.classList.contains('t24')) return;
+  let d=i.value.replace(/[^\d]/g,'').slice(0,4); if(d.length>=3) d=d.slice(0,d.length-2)+':'+d.slice(-2); i.value=d; i.classList.remove('bad'); },true);
+document.addEventListener('blur',e=>{ const i=e.target; if(!i.classList||!i.classList.contains('t24')) return;
+  const n=norm24(i.value); if(n===null){ i.classList.add('bad'); toast('שעה לא תקינה – יש להזין בפורמט 24 שעות, לדוגמה 16:00'); } else { i.value=n; i.dispatchEvent(new Event('change',{bubbles:true})); } },true);
+
+/* ================= TABS ================= */
+const TABS=['projects','hours','card','money','reports','clients'];
+function showTab(t){
+  $$('nav.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.tab===t));
+  TABS.forEach(x=>$('#tab-'+x).classList.toggle('hide',x!==t));
+  if(t==='card') showCard();
+  if(t==='money') showMoney();
+  if(t==='reports') renderReport();
+  if(t==='hours'){ checkTimerProject(); syncHoursProject(); }
+  window.scrollTo({top:0});
+}
+$$('nav.tabs button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+/* ================= HOURS ================= */
+/* timer: {project_id, first:Date, acc:ms, seg:Date|null (null = paused), last:Date|null, planned:Date|null} */
+let timer = null;
+const localISO = d => new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+const hhmm = d => d.toTimeString().slice(0,5);
+const elapsed = () => timer ? timer.acc + (timer.seg ? Date.now()-timer.seg : 0) : 0;
+const fmtDur = ms => { const s=Math.floor(ms/1000); return [s/3600,s%3600/60,s%60].map(x=>String(Math.floor(x)).padStart(2,'0')).join(':'); };
+function saveTimer(){ try{ timer ? localStorage.setItem('tk_timer',JSON.stringify(timer)) : localStorage.removeItem('tk_timer') }catch(e){} }
+function loadTimer(){ try{ const t=JSON.parse(localStorage.getItem('tk_timer')||'null'); if(t && t.first){ timer={project_id:t.project_id,first:new Date(t.first),acc:+t.acc||0,seg:t.seg?new Date(t.seg):null,last:t.last?new Date(t.last):null,planned:t.planned?new Date(t.planned):null}; } }catch(e){ timer=null; } }
+function initHours(){
+  $('#hDate').value = today();
+  const d = new Date(); const day=d.getDay(); const sun = new Date(d); sun.setDate(d.getDate()-day);
+  $('#hFrom').value = localISO(sun); $('#hTo').value = today();
+  const vs = visibleStaff();
+  $('#hWho').innerHTML = (vs.length>1?'<option value="">כל העובדים שלי</option>':'') + vs.map(s=>`<option value="${s.id}" ${(s.id===me.staff_id && !isMgmt())?'selected':''}>${esc(s.full_name)}</option>`).join('');
+  $('#hWhoWrap').classList.toggle('hide', vs.length<=1);
+  loadTimer(); if(timer?.planned) $('#hAutoAt').value=hhmm(timer.planned);
+  renderTimer(); renderHours(); tick();
+}
+/* planned end from the fields: "בשעה" or "בעוד שעות/דקות" */
+function plannedFromFields(base){
+  const at=norm24($('#hAutoAt').value)||'', h=+($('#hAutoH').value||0), m=+($('#hAutoM').value||0);
+  if(at){ const [a,b]=at.split(':').map(Number); const d=new Date(); d.setHours(a,b,0,0); if(d<=base) return 'past'; return d; }
+  if(h||m) return new Date(base.getTime()+(h*60+m)*60000);
+  return null;
+}
+$('#hAutoAt').addEventListener('input',()=>{ if($('#hAutoAt').value){ $('#hAutoH').value=''; $('#hAutoM').value=''; } updatePlan(); });
+['#hAutoH','#hAutoM'].forEach(s=>$(s).addEventListener('input',()=>{ if($('#hAutoH').value||$('#hAutoM').value) $('#hAutoAt').value=''; updatePlan(); }));
+function updatePlan(){
+  if(!timer || !timer.seg) return;
+  const p = plannedFromFields(new Date());
+  if(p==='past'){ toast('השעה שבחרת כבר עברה'); return; }
+  timer.planned = p; saveTimer(); tick();
+}
+function renderTimer(){
+  const b=$('#hTimer'), c=$('#hClock'), r=$('#hRunning'), a=$('#hAdd');
+  syncHoursProject();
+  if(!timer){ b.textContent='▶ התחל עבודה'; b.className='btn go'; b.title='התחלת מדידת זמן עכשיו לפרויקט שנבחר';
+    c.classList.add('hide'); r.classList.add('hide'); $('#hPlan').textContent=''; a.title='שמירת דיווח עם התאריך והשעות שבחרת'; return; }
+  c.classList.remove('hide'); r.textContent=projLabel(projById(timer.project_id)); r.classList.remove('hide');
+  if(timer.seg){ b.textContent='■ סיים עבודה'; b.className='btn stop'; b.title='עצירת השעון'; c.style.color=''; }
+  else { b.textContent='▶ המשך'; b.className='btn go'; b.title='המשך המדידה מאותו זמן'; c.style.color='var(--ok)';
+    a.title='שמירת זמן העבודה שנמדד ואיפוס השעון'; $('#hPlan').textContent=`השעון עצור – לחץ "המשך" או "שמור דיווח"`; }
+  c.textContent=fmtDur(elapsed());
+}
+function pauseTimer(at){ if(!timer||!timer.seg) return; const t=at||new Date(); timer.acc+=t-timer.seg; timer.seg=null; timer.last=t; timer.planned=null; saveTimer(); renderTimer(); }
+function resumeTimer(){ if(!timer||timer.seg) return; const pl=plannedFromFields(new Date()); timer.seg=new Date(); timer.planned=(pl&&pl!=='past')?pl:null; saveTimer(); renderTimer(); tick(); }
+function resetTimer(){ timer=null; saveTimer(); ['#hAutoAt','#hAutoH','#hAutoM'].forEach(s=>$(s).value=''); renderTimer(); }
+async function saveTimerEntry(auto){
+  if(!timer) return; if(timer.seg) pauseTimer();
+  const t=timer;
+  const e={staff_id:me.staff_id,project_id:t.project_id,work_date:localISO(t.first),start_time:hhmm(t.first),end_time:hhmm(t.last||new Date()),hours:Math.round(t.acc/36000)/100,notes:$('#hNotes').value||null};
+  let saved=true;
+  try{ await DB.saveEntry(e); }catch(x){ if(x!=='RO') throw x; saved=false; }
+  resetTimer(); $('#hNotes').value=''; renderHours();
+  const what=`${fmtDur(t.acc)} על ${t.project_id?projById(t.project_id)?.iso_number||'':''}`;
+  toast(!saved?`מצב הדגמה – ${what} לא נשמר בפועל, השעון אופס`: auto?`העבודה הסתיימה אוטומטית ב-${hhmm(t.last)} והדיווח נשמר`:`הדיווח נשמר (${what})`);
+  if(auto){ document.title='✔ הדיווח נשמר – PROJECTS'; setTimeout(()=>document.title='PROJECTS · טיקטין',8000); }
+}
+function tick(){
+  if(!timer || !timer.seg) return;
+  const now=new Date();
+  if(timer.planned && now>=timer.planned){ pauseTimer(timer.planned); saveTimerEntry(true); return; }
+  $('#hClock').textContent=fmtDur(elapsed());
+  if(timer.planned){ const left=Math.ceil((timer.planned-now)/60000); $('#hPlan').textContent=`ייעצר אוטומטית ב-${hhmm(timer.planned)} (עוד ${Math.floor(left/60)}:${String(left%60).padStart(2,'0')})`; }
+  else $('#hPlan').textContent='';
+}
+setInterval(tick,1000);
+$('#hTimer').onclick = ()=>{
+  if(!timer){
+    const p = curProj; if(!p) return toast('לא נבחר פרויקט – בחר פרויקט בלשונית "פרויקטים"');
+    const now=new Date(); const pl=plannedFromFields(now);
+    if(pl==='past') return toast('שעת הסיום שבחרת כבר עברה');
+    timer={project_id:p.id,first:now,acc:0,seg:now,last:null,planned:pl}; saveTimer();
+    renderTimer(); tick(); toast('המדידה התחילה – '+p.iso_number);
+  } else if(timer.seg){ pauseTimer(); toast('השעון נעצר – אפשר להמשיך או לשמור דיווח'); }
+  else { resumeTimer(); toast('המדידה ממשיכה'); }
+};
+$('#hAdd').onclick = async ()=>{
+  if(timer){ if(timer.seg) return toast('יש לעצור קודם את השעון ("סיים עבודה")'); return saveTimerEntry(false); }
+  const p = curProj; if(!p) return toast('לא נבחר פרויקט – בחר פרויקט בלשונית "פרויקטים"');
+  const s=norm24($('#hStart').value), e=norm24($('#hEnd').value), d=$('#hDate').value;
+  if(!d||!s||!e) return toast('יש למלא תאריך, שעת התחלה ושעת סיום בפורמט 24 שעות');
+  await DB.saveEntry({staff_id:me.staff_id,project_id:p.id,work_date:d,start_time:s,end_time:e,hours:hrs(s,e),notes:$('#hNotes').value||null});
+  $('#hStart').value=''; $('#hEnd').value=''; $('#hNotes').value='';
+  renderHours(); toast('הדיווח נשמר');
+};
+/* switching project while a timer exists – checked when entering the hours tab */
+function checkTimerProject(){
+  if(!timer || !curProj || curProj.id===timer.project_id) return;
+  if(!timer.seg){ resetTimer(); toast('נבחר פרויקט אחר – המונה אופס'); return; }
+  const old=projById(timer.project_id);
+  askModal(`השעון עדיין רץ על הפרויקט<br><b>${esc(projLabel(old))}</b><br>(${fmtDur(elapsed())})<br><br>לעצור ולשמור את העבודה על הפרויקט הקודם?`,
+    [{t:'כן – עצור ושמור',c:'pri',f:async()=>{ await saveTimerEntry(false); syncHoursProject(); }},
+     {t:'לא – אפס בלי לשמור',c:'',f:()=>{ resetTimer(); toast('המונה אופס בלי שמירה'); }},
+     {t:'המשך מדידה על הקודם',c:'',f:()=>{ selectProject(old); }}]);
+}
+function askModal(html,btns){
+  const m=$('#modal'); $('#modalText').innerHTML=html;
+  $('#modalBtns').innerHTML=''; btns.forEach(b=>{ const x=document.createElement('button'); x.className='btn '+(b.c||''); x.textContent=b.t; x.onclick=async()=>{ m.classList.add('hide'); await b.f(); }; $('#modalBtns').appendChild(x); });
+  m.classList.remove('hide');
+}
+['#hWho','#hFrom','#hTo'].forEach(s=>$(s).addEventListener('change',renderHours));
+function renderHours(){
+  const who=$('#hWho').value, f=$('#hFrom').value, t=$('#hTo').value;
+  const vis = new Set(visibleStaff().map(s=>s.id));
+  const rows = S.entries.filter(e=>vis.has(e.staff_id) && (!who||e.staff_id==who) && (!f||e.work_date>=f) && (!t||e.work_date<=t))
+    .sort((a,b)=>(b.work_date+b.start_time).localeCompare(a.work_date+a.start_time));
+  const multi = !who && visibleStaff().length>1;
+  let tot=0; rows.forEach(e=>tot+= +(e.hours??hrs(e.start_time,e.end_time)??0));
+  const LIM=800, shown=rows.slice(0,LIM);
+  $('#hTable').innerHTML = `<thead><tr><th>תאריך</th>${multi?'<th>עובד</th>':''}<th>פרויקט</th><th>התחלה</th><th>סיום</th><th class="num">שעות</th><th class="hide-m">הערה</th><th class="noprint"></th></tr></thead><tbody>`+
+    shown.map(e=>{ const p=projById(e.project_id); const h=e.hours??hrs(e.start_time,e.end_time)??0;
+      const mine = REAL===false && (e.staff_id===me.staff_id || isMgmt());
+      return `<tr><td>${e.work_date.split('-').reverse().join('.')}</td>${multi?`<td>${esc(staffName(e.staff_id))}</td>`:''}<td>${esc(projLabel(p))}</td><td>${e.start_time?.slice(0,5)||''}</td><td>${e.end_time?.slice(0,5)||''}</td><td class="num">${(+h).toFixed(2)}</td><td class="hide-m">${esc(e.notes)}</td>
+      <td class="noprint">${mine?`<button class="btn sm" data-ed="${e.id}" title="עריכה">✎</button> <button class="btn sm" data-del="${e.id}" title="מחיקה">🗑</button>`:''}</td></tr>`}).join('')+'</tbody>';
+  $('#hTotal').textContent = `סה"כ: ${tot.toFixed(2)} שעות · ${rows.length.toLocaleString('he-IL')} דיווחים`+(rows.length>LIM?` (מוצגים ${LIM} אחרונים – צמצם תאריכים או עובד)`:'');
+  $$('#hTable [data-del]').forEach(b=>b.onclick=async()=>{ await DB.delEntry(+b.dataset.del); renderHours(); toast('נמחק'); });
+  $$('#hTable [data-ed]').forEach(b=>b.onclick=()=>{ const e=S.entries.find(x=>x.id==b.dataset.ed);
+    selectProject(projById(e.project_id)); $('#hDate').value=e.work_date; $('#hStart').value=e.start_time?.slice(0,5)||''; $('#hEnd').value=e.end_time?.slice(0,5)||''; $('#hNotes').value=e.notes||'';
+    $('#hAdd').textContent='עדכן דיווח'; $('#hAdd').onclick=async()=>{ const p=curProj; if(!p) return toast('לא נבחר פרויקט');
+      await DB.saveEntry({id:e.id,staff_id:e.staff_id,project_id:p.id,work_date:$('#hDate').value,start_time:$('#hStart').value,end_time:$('#hEnd').value,hours:hrs($('#hStart').value,$('#hEnd').value),notes:$('#hNotes').value||null});
+      location.hash=''; resetHours(); renderHours(); toast('עודכן'); };
+    window.scrollTo({top:0,behavior:'smooth'}); });
+}
+const addHandler = $('#hAdd').onclick;
+function resetHours(){ ['#hStart','#hEnd','#hNotes'].forEach(s=>$(s).value=''); $('#hDate').value=today(); $('#hAdd').textContent='שמור דיווח'; $('#hAdd').onclick=addHandler; }
+
+/* ================= PROJECTS ================= */
+let curProj = null;
+let showAll=null;
+const inTeam=(p,sid)=>{ const t=S.team&&S.team.get(p.id); return !!(t&&t.has(sid)); };
+function myProjectIds(){
+  const ids=new Set([me.staff_id]);
+  if(me.role==='team_lead') S.staff.forEach(s=>{ if(s.team_lead===me.staff_id) ids.add(s.id); });
+  return ids;
+}
+$('#pScope').onclick=()=>{ showAll=!showAll; renderProjects(); };
+function initProjects(){
+  showAll = isFin();
+  $('#pStatusF').innerHTML = '<option value="">כל הסטטוסים</option>'+STATUSES.map(s=>`<option>${s}</option>`).join('');
+  $('#p_status').innerHTML = STATUSES.map(s=>`<option>${s}</option>`).join('');
+  $('#pmSoftList').innerHTML = PM_SOFTWARE.filter(Boolean).filter(x=>x!=='אחר').map(s=>`<option value="${s}">`).join('');
+  $('#p_engineer').innerHTML = '<option value="">—</option>'+S.staff.map(s=>`<option value="${s.id}">${esc(s.full_name)}</option>`).join('');
+  renderProjects();
+}
+$('#pSearch').addEventListener('input',debounce(renderProjects,180)); $('#pStatusF').addEventListener('input',renderProjects);
+$('#pTable').addEventListener('click',e=>{ const tr=e.target.closest('tr.click'); if(tr) selectProject(projById(+tr.dataset.id)); });
+$('#pTable').addEventListener('dblclick',e=>{ const tr=e.target.closest('tr.click'); if(tr){ selectProject(projById(+tr.dataset.id)); showTab('card'); } });
+const PSORT={key:'iso',dir:-1}; const COLL=new Intl.Collator('he',{sensitivity:'base'});
+const PCOLS=[['iso','ISO',p=>parseInt(p.iso_number)||0],['name','שם הפרויקט',p=>p.name||''],['client','לקוח',p=>clientName(p.client_id)],['status','סטטוס',p=>STATUSES.indexOf(p.status)],['eng','אחראי',p=>staffName(p.responsible_engineer_id)],['pm','חברת ניהול',p=>p.pm_company||'']];
+$('#pTable').addEventListener('click',e=>{ const th=e.target.closest('th[data-sort]'); if(!th) return; const k=th.dataset.sort; PSORT.dir = PSORT.key===k ? -PSORT.dir : (k==='iso'?-1:1); PSORT.key=k; renderProjects(); });
+function renderProjects(){
+  const q=$('#pSearch').value.trim().toLowerCase(), st=$('#pStatusF').value;
+  const mine = showAll ? null : myProjectIds();
+  $('#pScope').textContent = showAll ? 'הצג רק את הפרויקטים שלי' : 'הצג את כל הפרויקטים';
+  $('#pScope').classList.toggle('on',!!showAll);
+  const rows=S.projects.filter(p=>(showAll || [...mine].some(sid=>inTeam(p,sid))) && (!st||p.status===st) && (!q || (p._s||(p._s=[p.iso_number,p.name,p.alias,clientName(p.client_id),p.pm_company,staffName(p.responsible_engineer_id)].join(' ').toLowerCase())).includes(q)));
+  const col=PCOLS.find(c=>c[0]===PSORT.key), f=col[2], d=PSORT.dir;
+  const keyed=rows.map(p=>[f(p),parseInt(p.iso_number)||0,p]); const num=typeof (keyed[0]||[0])[0]==='number';
+  keyed.sort((A,B)=>{ if(!num){ if(!A[0]&&B[0]) return 1; if(A[0]&&!B[0]) return -1; } const r = num ? A[0]-B[0] : COLL.compare(A[0],B[0]); return r? r*d : B[1]-A[1]; });
+  rows.length=0; keyed.forEach(k=>rows.push(k[2]));
+  const hd=PCOLS.map(c=>`<th data-sort="${c[0]}" class="sortable${(c[0]==='eng'||c[0]==='pm')?' hide-m':''}" title="מיון לפי ${c[1]}">${c[1]} ${PSORT.key===c[0]?(PSORT.dir>0?'▲':'▼'):'<span class="muted">⇅</span>'}</th>`).join('');
+  chunkRender('pTable',`<thead><tr>${hd}</tr></thead>`, rows,
+    p=>`<tr class="click ${curProj?.id===p.id?'sel':''}" data-id="${p.id}"><td>${esc(p.iso_number)}</td><td>${esc(p.name)}${p.alias?` <span class="muted">(${esc(p.alias)})</span>`:''}</td><td>${esc(clientName(p.client_id))}</td><td><span class="pill st-${(p.status||'').split(' ')[0]}">${esc(p.status)}</span></td><td class="hide-m">${esc(staffName(p.responsible_engineer_id))}</td><td class="hide-m">${esc(p.pm_company)}</td></tr>`);
+  $('#pCount').textContent = (showAll?'כל הפרויקטים · ':'הפרויקטים שלי · ')+`${rows.length.toLocaleString('he-IL')} פרויקטים`+(!showAll&&!rows.length&&!q?' – לא נמצאו פרויקטים שאתה בצוות שלהם, לחץ "הצג את כל הפרויקטים"':'');
+}
+const P_FIELDS=['iso_number:p_iso','name:p_name','alias:p_alias','status:p_status','pm_company:p_pm_company','pm_software:p_pm_software','iec_network_planner:p_iec_planner','iec_halav:p_iec_halav','notes:p_notes'];
+const RELOC=['electric','bezeq','hot','cellcom','partner','unlimited'];
+let newMode=false;
+function selectProject(p){
+  curProj=p||null; newMode=false;
+  $('#selName').textContent = p ? projLabel(p) : 'לא נבחר פרויקט – בחר בלשונית "פרויקטים"';
+  $('#selClear').classList.toggle('hide',!p);
+  $$('#pTable tr.sel').forEach(tr=>tr.classList.remove('sel')); if(p){ const tr=$(`#pTable tr[data-id="${p.id}"]`); tr&&tr.classList.add('sel'); }
+  syncHoursProject();
+}
+$('#selClear').onclick=()=>{ selectProject(null); const t=$('nav.tabs button.on')?.dataset.tab; if(t) showTab(t); };
+function syncHoursProject(){
+  const el=$('#hProject'); if(!el) return;
+  const p = timer ? projById(timer.project_id) : curProj;
+  el.textContent = p ? projLabel(p) : 'לא נבחר פרויקט – בחר בלשונית "פרויקטים"';
+  el.classList.toggle('none',!p);
+  el.title = timer ? 'בזמן מדידה לא ניתן להחליף פרויקט – יש לעצור קודם את השעון' : 'לבחירת פרויקט אחר עבור ללשונית "פרויקטים"';
+}
+function showCard(){
+  const has = !!curProj || newMode;
+  $('#cardEmpty').classList.toggle('hide',has); $('#pCard').classList.toggle('hide',!has);
+  if(!has) return;
+  const p = curProj || {status:'טרם התחיל'};
+  P_FIELDS.forEach(x=>{const [k,id]=x.split(':'); $('#'+id).value=p[k]??''});
+  $('#p_client').value = clientName(p.client_id);
+  $('#p_engineer').value = p.responsible_engineer_id??'';
+  RELOC.forEach(r=>$('#p_reloc_'+r).checked=!!p['reloc_'+r]);
+  $('#pCardTitle').textContent = curProj?`כרטיס פרויקט ${p.iso_number||''}`:'פרויקט חדש';
+  const locked = !!curProj && !isMgmt();
+  $$('#pCard .lockable').forEach(i=>{ i.disabled=locked; i.nextElementSibling.classList.toggle('hide',locked); i.title=locked?'מגיע ממאסטר פלאן – רק הנהלה יכולה לשנות':''; });
+  $('#lockNote').classList.toggle('hide',!locked);
+  renderTeam();
+}
+function renderTeam(){
+  if(!curProj){ $('#teamChips').innerHTML='<span class="muted">יש לשמור קודם את הפרויקט</span>'; $('#teamAdd').classList.add('hide'); return; }
+  const t=[...(S.team.get(curProj.id)||[])].map(id=>IX.s.get(id)).filter(Boolean).sort((a,b)=>COLL.compare(a.full_name,b.full_name));
+  const canEdit = isMgmt() || me.role==='team_lead';
+  $('#teamChips').innerHTML = t.length ? t.map(s=>`<span class="chip">${esc(s.full_name)}${canEdit?` <button data-rm="${s.id}" title="הסרה מהצוות">✕</button>`:''}</span>`).join('') : '<span class="muted">אין עדיין עובדים בצוות</span>';
+  $('#teamAdd').classList.toggle('hide',!canEdit);
+  if(canEdit) $('#teamSel').innerHTML='<option value="">בחר עובד להוספה…</option>'+S.staff.filter(s=>s.active!==false && !t.includes(s)).sort((a,b)=>COLL.compare(a.full_name,b.full_name)).map(s=>`<option value="${s.id}">${esc(s.full_name)}</option>`).join('');
+}
+$('#teamChips').addEventListener('click',async e=>{ const b=e.target.closest('[data-rm]'); if(!b) return; await DB.teamRemove(curProj.id,+b.dataset.rm); renderTeam(); renderProjects(); });
+$('#teamAddBtn').onclick=async()=>{ const id=+$('#teamSel').value; if(!id) return toast('בחר עובד'); await DB.teamAdd(curProj.id,id); renderTeam(); renderProjects(); toast('העובד נוסף לצוות'); };
+function showMoney(){
+  if(FIN_OFF){ S.finance={}; S.bills=[]; S.incr=[]; $('#moneyAll').classList.add('hide'); $('#moneyCard').classList.add('hide'); $('#moneyEmpty').classList.remove('hide');
+    $('#moneyEmpty').textContent = isFin() ? 'נתונים כספיים לא זמינים כרגע.' : 'אין הרשאה לצפייה בכספים.'; return; }
+  const hasFin = Object.keys(S.finance).length>0 || REAL===false;
+  const ok = !!curProj && isFin() && hasFin;
+  $('#moneyEmpty').classList.toggle('hide',isFin()); $('#moneyEmpty').textContent='אין הרשאה לצפייה בכספים.';
+  $('#moneyAll').classList.toggle('hide',!isFin()||ok); $('#moneyCard').classList.toggle('hide',!ok);
+  if(!isFin()) return;
+  if(!ok){ renderMoneyAll(); return; }
+  const f=S.finance[curProj.id]||{}; $('#f_base').textContent=fmtMoney(f.base_fee); $('#f_sub').textContent=fmtMoney(f.submitted_total); $('#f_paid').textContent=fmtMoney(f.paid_total); $('#f_total').textContent=fmtMoney((+f.submitted_total||0)-(+f.paid_total||0));
+  $('#moneyTitle').textContent='כספים – '+projLabel(curProj); renderBills();
+}
+const BILL_ST={1:'ביצירה',2:'הוגש',3:'אושר',4:'סגור'};
+$('#mSearch').addEventListener('input',debounce(()=>renderMoneyAll(),180));
+function renderMoneyAll(){
+  const q=$('#mSearch').value.trim().toLowerCase(); const LIM=100000;
+  if(!S.lastBill){ S.lastBill={}; (S.bills||[]).forEach(b=>{ if((b.date||'')>(S.lastBill[b.project_id]||'')) S.lastBill[b.project_id]=b.date; }); }
+  const rows=Object.entries(S.finance).map(([pid,f])=>({p:projById(+pid),f,lb:S.lastBill[+pid]||''})).filter(x=>x.p && ((+x.f.base_fee||0)+(+x.f.submitted_total||0)+(+x.f.paid_total||0))>0 && (!q || [x.p.iso_number,x.p.name,clientName(x.p.client_id)].join(' ').toLowerCase().includes(q)))
+    .sort((a,b)=>b.lb.localeCompare(a.lb) || (parseInt(b.p.iso_number)||0)-(parseInt(a.p.iso_number)||0));
+  let T=[0,0,0]; rows.forEach(({f})=>{T[0]+=+f.base_fee||0;T[1]+=+f.submitted_total||0;T[2]+=+f.paid_total||0;});
+  if(rows.length){ chunkRender('mTable',`<thead><tr><th>ISO</th><th>פרויקט</th><th>לקוח</th><th>סטטוס</th><th class="num">שכ"ט</th><th class="num">הוגש</th><th class="num">שולם</th><th class="num">יתרה לגבייה</th><th>חשבון אחרון</th></tr></thead>`, rows,
+    ({p,f,lb})=>`<tr class="click" data-id="${p.id}"><td>${esc(p.iso_number)}</td><td>${esc(p.name)}</td><td>${esc(clientName(p.client_id))}</td><td>${esc(p.status)}</td><td class="num">${fmtMoney(f.base_fee)}</td><td class="num">${fmtMoney(f.submitted_total)}</td><td class="num">${fmtMoney(f.paid_total)}</td><td class="num">${fmtMoney((+f.submitted_total||0)-(+f.paid_total||0))}</td><td>${lb?lb.split('-').reverse().join('.'):''}</td></tr>`); }
+  else $('#mTable').innerHTML = `<tbody><tr><td class="empty">${Object.keys(S.finance).length?'לא נמצאו פרויקטים':'בקובץ הזה אין נתוני כספים. הכספים נמצאים בדף "PROJECTS דמו כספים" ובקובץ PROJECTS-demo-finance.html בתיקיית ההורדות.'}</td></tr></tbody>`;
+  $('#mCount').textContent = rows.length ? `${rows.length.toLocaleString('he-IL')} פרויקטים · שכ"ט ${fmtMoney(T[0])} · הוגש ${fmtMoney(T[1])} · שולם ${fmtMoney(T[2])}`+(rows.length>LIM?` · מוצגים ${LIM} – צמצם בחיפוש`:'') : '';
+}
+$('#mTable').addEventListener('click',e=>{ const tr=e.target.closest('tr.click'); if(tr){ selectProject(projById(+tr.dataset.id)); showMoney(); } });
+function renderBills(){
+  const L=(S.bills||[]).filter(b=>curProj&&b.project_id===curProj.id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  $('#bTable').innerHTML = L.length ? `<thead><tr><th>מס' חשבון</th><th>תאריך הגשה</th><th class="num">סכום</th><th class="num">סכום מאושר</th><th>סטטוס</th></tr></thead><tbody>`+
+    L.map(b=>`<tr><td>${esc(b.num)}</td><td>${(b.date||'').split('-').reverse().join('.')}</td><td class="num">${fmtMoney(b.sum)}</td><td class="num">${b.approved?fmtMoney(b.approved):''}</td><td>${BILL_ST[b.status]||''}</td></tr>`).join('')+'</tbody>'
+    : '<tbody><tr><td class="muted">אין חשבונות לפרויקט</td></tr></tbody>';
+  $('#bSum').textContent = L.length ? `– ${L.length} חשבונות, סה"כ ${fmtMoney(L.reduce((a,b)=>a+b.sum,0))}` : '';
+}
+$('#pNew').onclick=()=>{ curProj=null; newMode=true; selectProject(null); newMode=true; showTab('card'); };
+$('#pSave').onclick=async()=>{
+  const p={}; P_FIELDS.forEach(x=>{const [k,id]=x.split(':'); p[k]=$('#'+id).value.trim()||null});
+  if(!p.name) return toast('חסר שם פרויקט'); p.status=p.status||'טרם התחיל';
+  const cn=$('#p_client').value.trim(); let c=cn?clientByName(cn):null;
+  if(cn && !c) c=await DB.saveClient({name:cn});
+  p.client_id=c?.id??null; p.responsible_engineer_id=+$('#p_engineer').value||null;
+  RELOC.forEach(r=>p['reloc_'+r]=$('#p_reloc_'+r).checked);
+  if(curProj && !isMgmt()){ p.iso_number=curProj.iso_number; p.name=curProj.name; p.client_id=curProj.client_id; }
+  if(curProj) p.id=curProj.id;
+  const saved=await DB.saveProject(p);
+  fillDatalists(); selectProject(saved); renderProjects(); showCard(); toast('הפרויקט נשמר');
+};
+
+/* ================= REPORTS ================= */
+function initReports(){ const d=new Date(); $('#rFrom').value=localISO(new Date(d.getFullYear(),0,1)); $('#rTo').value=today(); }
+['#rType','#rFrom','#rTo'].forEach(x=>$(x).addEventListener('change',renderReport));
+function renderReport(){
+  const type=$('#rType').value, f=$('#rFrom').value, t=$('#rTo').value;
+  const vis=new Set(visibleStaff().map(s=>s.id));
+  const needP = type.startsWith('proj') && type!=='projSum';
+  if(needP && !curProj){ $('#rTable').innerHTML='<tbody><tr><td class="empty">לא נבחר פרויקט – בחר פרויקט בלשונית "פרויקטים", או בחר דוח של כל הפרויקטים.</td></tr></tbody>'; $('#rTotal').textContent=''; return; }
+  const E=S.entries.filter(e=>vis.has(e.staff_id) && (!f||e.work_date>=f) && (!t||e.work_date<=t) && (!needP||e.project_id===curProj.id));
+  const H=e=>+(e.hours??hrs(e.start_time,e.end_time)??0);
+  let head, rows, tot=E.reduce((a,e)=>a+H(e),0);
+  const group=(keyF)=>{ const m=new Map(); E.forEach(e=>{const k=keyF(e); const o=m.get(k)||{h:0,n:0}; o.h+=H(e); o.n++; m.set(k,o);}); return [...m.entries()].sort((a,b)=>b[1].h-a[1].h); };
+  if(type==='projEmp'){ head=['עובד','דיווחים','שעות']; rows=group(e=>e.staff_id).map(([k,o])=>[staffName(k),o.n,o.h.toFixed(2)]); }
+  if(type==='projMonth'){ head=['חודש','דיווחים','שעות']; rows=group(e=>e.work_date.slice(0,7)).sort((a,b)=>b[0].localeCompare(a[0])).map(([k,o])=>[k.split('-').reverse().join('/'),o.n,o.h.toFixed(2)]); }
+  if(type==='projList'){ head=['תאריך','עובד','שעות','הערה']; rows=E.slice().sort((a,b)=>b.work_date.localeCompare(a.work_date)).slice(0,1500).map(e=>[e.work_date.split('-').reverse().join('.'),staffName(e.staff_id),H(e).toFixed(2),e.notes||'']); }
+  if(type==='empSum'){ head=['עובד','דיווחים','שעות']; rows=group(e=>e.staff_id).map(([k,o])=>[staffName(k),o.n,o.h.toFixed(2)]); }
+  if(type==='projSum'){ head=['פרויקט','דיווחים','שעות']; rows=group(e=>e.project_id).slice(0,1500).map(([k,o])=>[projLabel(projById(k)),o.n,o.h.toFixed(2)]); }
+  const numCol=i=>head[i]==='שעות'||head[i]==='דיווחים';
+  $('#rTable').innerHTML='<thead><tr>'+head.map((h,i)=>`<th class="${numCol(i)?'num':''}">${h}</th>`).join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map((c,i)=>`<td class="${numCol(i)?'num':''}">${esc(c)}</td>`).join('')+'</tr>').join('')+'</tbody>';
+  $('#rTotal').textContent=`סה"כ: ${tot.toFixed(2)} שעות · ${E.length.toLocaleString('he-IL')} דיווחים`+(needP?` · ${projLabel(curProj)}`:'');
+}
+
+/* ================= CLIENTS / CONTACTS ================= */
+let curContact=null;
+$('#cSearch').addEventListener('input',renderClients);
+function renderClients(){
+  const q=$('#cSearch').value.trim().toLowerCase();
+  const rows=[]; const LIM=300;
+  for(const k of S.contacts){ const cn=clientName(k.client_id); if(!q||(k._s||(k._s=[k.full_name,cn,k.mobile,k.phone,k.email,k.title].join(' ').toLowerCase())).includes(q)) rows.push({k,cn}); }
+  const withC = IX.withC || (IX.withC=new Set(S.contacts.map(k=>k.client_id)));
+  const clientsNoContact = q ? S.clients.filter(c=>!withC.has(c.id) && c.name.toLowerCase().includes(q)) : [];
+  const total=rows.length;
+  $('#cTable').innerHTML = `<thead><tr><th>לקוח / חברה</th><th>איש קשר</th><th class="hide-m">תפקיד</th><th>נייד</th><th class="hide-m">טלפון</th><th>מייל</th></tr></thead><tbody>`+
+    rows.slice(0,LIM).map(({k,cn})=>`<tr class="click" data-k="${k.id}"><td>${esc(cn)}</td><td>${esc(k.full_name)}</td><td class="hide-m">${esc(k.title)}</td><td><a href="tel:${esc(k.mobile)}">${esc(k.mobile)}</a></td><td class="hide-m">${esc(k.phone)}</td><td><a href="mailto:${esc(k.email)}">${esc(k.email)}</a></td></tr>`).join('')+
+    clientsNoContact.slice(0,300).map(c=>`<tr><td>${esc(c.name)}</td><td class="muted" colspan="5">אין אנשי קשר</td></tr>`).join('')+'</tbody>';
+  $('#cCount').textContent=`${S.clients.length.toLocaleString('he-IL')} לקוחות · ${S.contacts.length.toLocaleString('he-IL')} אנשי קשר`+(total>LIM?` · נמצאו ${total.toLocaleString('he-IL')}, מוצגים ${LIM} – צמצם בחיפוש`:(q?` · נמצאו ${total}`:''));
+  $$('#cTable tr.click').forEach(tr=>tr.onclick=e=>{ if(e.target.tagName==='A') return; openContact(S.contacts.find(k=>k.id==tr.dataset.k)); });
+}
+const K_FIELDS=['full_name:k_name','title:k_title','mobile:k_mobile','phone:k_phone','email:k_email','notes:k_notes'];
+function openContact(k){ curContact=k||null; k=k||{}; K_FIELDS.forEach(x=>{const [f,id]=x.split(':'); $('#'+id).value=k[f]??''}); $('#k_client').value=clientName(k.client_id);
+  $('#kCardTitle').textContent=curContact?'איש קשר – '+k.full_name:'איש קשר חדש'; $('#kCard').classList.remove('hide'); $('#kCard').scrollIntoView({behavior:'smooth'}); }
+$('#kNew').onclick=()=>openContact(null);
+$('#cNew').onclick=async()=>{ const n=$('#cSearch').value.trim(); if(!n) return toast('כתוב את שם הלקוח בשדה החיפוש ולחץ שוב'); if(clientByName(n)) return toast('הלקוח כבר קיים'); await DB.saveClient({name:n}); fillDatalists(); renderClients(); toast('הלקוח נוסף'); };
+$('#kSave').onclick=async()=>{ const k={}; K_FIELDS.forEach(x=>{const [f,id]=x.split(':'); k[f]=$('#'+id).value.trim()||null}); if(!k.full_name) return toast('חסר שם');
+  const cn=$('#k_client').value.trim(); let c=cn?clientByName(cn):null; if(cn&&!c) c=await DB.saveClient({name:cn}); k.client_id=c?.id??null; if(curContact) k.id=curContact.id;
+  curContact=await DB.saveContact(k); fillDatalists(); renderClients(); toast('נשמר'); };
+
+/* ================= RESET / EXPORT ================= */
+$$('[data-reset]').forEach(b=>b.onclick=()=>{
+  const w=b.dataset.reset;
+  if(w==='hours'){ resetHours(); initHours(); }
+  if(w==='project'){ showCard(); }
+  if(w==='money'){ showMoney(); }
+  if(w==='reports'){ $('#rType').selectedIndex=0; initReports(); renderReport(); }
+  if(w==='contact'){ openContact(curContact); }
+  toast('הטופס אופס');
+});
+function tableFor(id){
+  if(id!=='pCard') return $('#'+id);
+  const t=document.createElement('table'); const rows=[['מספר ISO',$('#p_iso').value],['שם הפרויקט',$('#p_name').value],['שם נוסף',$('#p_alias').value],['לקוח',$('#p_client').value],['סטטוס',$('#p_status').value],['חברת ניהול פרויקטים',$('#p_pm_company').value],['תוכנת ניהול',$('#p_pm_software').value],['מהנדס אחראי',$('#p_engineer').selectedOptions[0]?.text||''],['מתכנן רשת חח"י',$('#p_iec_planner').value],['חל"ב חח"י',$('#p_iec_halav').value],['העתקות תשתיות',RELOC.filter(r=>$('#p_reloc_'+r).checked).map(r=>({electric:'חשמל',bezeq:'בזק',hot:'הוט',cellcom:'סלקום',partner:'פרטנר',unlimited:'אנלימיטד'})[r]).join(', ')],['הערות',$('#p_notes').value]];
+  if(false) rows.push(['שכ"ט מקורי',$('#f_base').value],['הוגש',$('#f_sub').value],['שולם',$('#f_paid').value],['שכ"ט מעודכן',$('#f_total').textContent]);
+  t.innerHTML='<tbody>'+rows.map(r=>`<tr><th>${esc(r[0])}</th><td>${esc(r[1])}</td></tr>`).join('')+'</tbody>'; return t;
+}
+function cleanClone(t){ const c=t.cloneNode(true); c.querySelectorAll('.noprint').forEach(e=>e.remove()); return c; }
+let xlsxLoading=null;
+function loadXLSX(){ return xlsxLoading ||= new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)}); }
+$$('[data-exp]').forEach(b=>b.onclick=async()=>{
+  const t=cleanClone(tableFor(b.dataset.t)), name='PROJECTS_'+b.dataset.t+'_'+today();
+  if(b.dataset.exp==='xlsx'){ await loadXLSX(); const wb=XLSX.utils.book_new(); const ws=XLSX.utils.table_to_sheet(t); ws['!views']=[{RTL:true}]; XLSX.utils.book_append_sheet(wb,ws,'נתונים'); XLSX.writeFile(wb,name+'.xlsx'); }
+  if(b.dataset.exp==='doc'){ const html=`<html dir="rtl"><head><meta charset="utf-8"><style>body{font-family:Arial;direction:rtl}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px 6px;text-align:right}</style></head><body><h2>טיקטין – PROJECTS</h2>${t.outerHTML}</body></html>`;
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+html],{type:'application/msword'})); a.download=name+'.doc'; a.click(); }
+  if(b.dataset.exp==='pdf'){ const w=window.open('','_blank'); w.document.write(`<html dir="rtl"><head><meta charset="utf-8"><title>${name}</title><style>body{font-family:Arial;direction:rtl}img{height:50px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:4px 6px;text-align:right;font-size:12px}</style></head><body><img src="${location.href.replace(/[^/]*$/,'')}logo.png"><h2>PROJECTS</h2>${t.outerHTML}<script>setTimeout(()=>print(),400)<\/script></body></html>`); w.document.close(); }
+});
+
+/* ================= ZOOM (בתוך האפליקציה, לא משפיע על הדפדפן) ================= */
+const Z = {v:1, fit:false};
+try{ const z=JSON.parse(localStorage.getItem('tk_projects_zoom')||'null'); if(z){Z.v=z.v||1;Z.fit=!!z.fit} }catch(e){}
+function applyZoom(){
+  let v = Z.v;
+  if(Z.fit){ v = Math.max(0.6, Math.min(2, window.innerWidth/1280)); }
+  document.body.style.zoom = v;
+  document.body.classList.toggle('fit', Z.fit);
+  $('#zVal').textContent = Math.round(v*100)+'%';
+  $('#zFit').classList.toggle('on', Z.fit);
+  try{ localStorage.setItem('tk_projects_zoom', JSON.stringify(Z)) }catch(e){}
+}
+$('#zIn').onclick = ()=>{ Z.fit=false; Z.v=Math.min(2, +(Z.v+0.1).toFixed(2)); applyZoom(); };
+$('#zOut').onclick = ()=>{ Z.fit=false; Z.v=Math.max(0.5, +(Z.v-0.1).toFixed(2)); applyZoom(); };
+$('#zVal').onclick = ()=>{ Z.fit=false; Z.v=1; applyZoom(); };
+$('#zFit').onclick = ()=>{ Z.fit=!Z.fit; if(!Z.fit) Z.v=1; applyZoom(); };
+window.addEventListener('resize', ()=>{ if(Z.fit) applyZoom(); });
+applyZoom();
+
+/* ================= BOOT ================= */
+function buildTeamFromEntries(){ S.team=new Map(); const addT=(p,s)=>{ if(!p||!s) return; let t=S.team.get(p); if(!t) S.team.set(p,t=new Set()); t.add(s); };
+  S.entries.forEach(e=>addT(e.project_id,e.staff_id)); S.projects.forEach(p=>addT(p.id,p.responsible_engineer_id)); }
+function startApp(){
+  if(!S.team) buildTeamFromEntries();
+  $('#login').classList.add('hide'); $('#app').classList.remove('hide');
+  $('#ver').textContent = `גרסה ${VERSION} · עודכן ${VERSION_DATE}`;
+  $('#who').textContent = `${me.name} · ${ROLE_HE[me.role]||''}`;
+  $('#tabMoney').classList.toggle('hide',!isFin());
+  $('#pNew').classList.toggle('hide',!isFin());
+  fillDatalists(); initHours(); initProjects(); initReports(); renderClients(); wireInputs();
+  selectProject(curProj); showTab('projects');
+}
+$('#btnOut').onclick=()=>DB.signOut();
+$('#loginVer').textContent = `גרסה ${VERSION} · עודכן ${VERSION_DATE}`;
+wireInputs();
+
+/* ================= גרסת התנסות: הקוד ב-GitHub, הנתונים מוצפנים בשרת, סיסמה אישית, רישום כניסות בשרת ================= */
+let GATE=null;
+const API_KEY='sb_publishable_uB5C7kIPCY3VlQOrczPpag_rsR1PnBq';
+const b64d=s=>{ const b=atob(s), u=new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u; };
+async function rpc(fn,args){
+  const r=await fetch(SUPABASE_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:API_KEY,'Content-Type':'application/json'},body:JSON.stringify(args)});
+  if(!r.ok){ const t=await r.text(); const e=new Error(t); e.status=r.status; throw e; }
+  return r.json();
+}
+async function gateDecrypt(E,slot,pw){
+  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  const kek=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64d(slot.s),iterations:E.it,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
+  const dk=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(slot.i)},kek,b64d(slot.w)));
+  const k=await crypto.subtle.importKey('raw',dk,'AES-GCM',false,['decrypt']);
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(E.iv)},k,b64d(E.ct));
+  const txt=await new Response(new Blob([pt]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+  const el=document.createElement('script'); el.id='demoData'; el.type='application/json'; el.textContent=txt; document.body.appendChild(el);
+}
+/* מטמון מקומי של הקובץ המוצפן – כדי שהפתיחה תהיה מהירה ולא יורדים הנתונים בכל פעם */
+async function cacheGet(){ try{ const c=await caches.open('tp-data'); const r=await c.match('./__data'); if(!r) return null; return {ver:r.headers.get('x-ver'), text:await r.text()}; }catch(e){ return null; } }
+async function cachePut(ver,text){ try{ const c=await caches.open('tp-data'); await c.put('./__data',new Response(text,{headers:{'x-ver':ver}})); }catch(e){} }
+async function gateOpen(n,pw,event){
+  const cached=await cacheGet();
+  const res=await rpc('demo_open',{p_user:n,p_pw:pw,p_event:event,p_ua:navigator.userAgent.slice(0,300),p_have:cached?.ver||null});
+  if(res.error){ const e=new Error('bad'); e.status=400; throw e; }
+  if(!res.ver) return {nodata:true};
+  let text=res.data; if(text==null){ text=cached.text; } else cachePut(res.ver,text);
+  await gateDecrypt(JSON.parse(text),res,pw);
+  const i=TRIAL.users.indexOf(n); GATE={user:n,role:res.r,idx:i<0?0:i};
+  return {ok:true};
+}
+async function gateUpload(n,pw,file){
+  const text=await file.text(); const E=JSON.parse(text); if(!E.ct||!E.iv) throw new Error('קובץ לא תקין');
+  const CH=400000;
+  for(let i=0;i<text.length;i+=CH){ $('#gateErr').textContent=`מעלה… ${Math.min(100,Math.round((i+CH)/text.length*100))}%`;
+    await rpc('demo_put',{p_user:n,p_pw:pw,p_k:'data_new',p_v:text.slice(i,i+CH),p_append:i>0}); }
+  await rpc('demo_put',{p_user:n,p_pw:pw,p_k:'commit',p_v:E.ver||String(Date.now()),p_append:false});
+}
+async function gate(){
+  let m=null; try{ m=JSON.parse(localStorage.getItem('tp_auth')||'null'); }catch(e){}
+  if(m?.p && TRIAL.users.includes(m.n)){
+    try{ const r=await gateOpen(m.n,m.p,'open'); if(r.ok) return; }catch(e){ if(e.status) { try{ localStorage.removeItem('tp_auth'); }catch(_){} } }
+  }
+  $('#gateVer').textContent=`גרסה ${VERSION} · עודכן ${VERSION_DATE}`;
+  $('#gateUser').innerHTML='<option value="">מי נכנס/ת?</option>'+TRIAL.users.map(u=>`<option>${esc(u)}</option>`).join('');
+  if(m?.n) $('#gateUser').value=m.n;
+  $('#gate').classList.remove('hide'); (m?.n?$('#gatePw'):$('#gateUser')).focus();
+  await new Promise(done=>{
+    const go=async()=>{ const n=$('#gateUser').value, pw=$('#gatePw').value; $('#gateErr').textContent='';
+      if(!n) return $('#gateErr').textContent='בחר/י שם';
+      if(!pw) return $('#gateErr').textContent='הקלד/י סיסמה';
+      $('#gateGo').disabled=true; $('#gateGo').textContent='פותח…';
+      try{
+        const f=$('#gateFile').files[0];
+        if(f){ await gateUpload(n,pw,f); $('#gateFile').value=''; }
+        const r=await gateOpen(n,pw,'login');
+        if(r.nodata){ $('#gateErr').textContent='הנתונים עדיין לא הועלו לשרת'+(n==='יובל'?' – בחר את קובץ הנתונים והקש כניסה':''); $('#gateUp').classList.toggle('hide',n!=='יובל'); }
+        else { try{ localStorage.setItem('tp_auth',JSON.stringify($('#gateRem').checked?{n,p:pw}:{n})); }catch(e){}
+          $('#gate').classList.add('hide'); done(); }
+      }catch(e){ $('#gateErr').textContent = e.status ? (/denied|bad/.test(e.message)?'סיסמה שגויה':'שגיאה: '+e.message.slice(0,120)) : 'אין חיבור לשרת – בדוק את האינטרנט ונסה שוב'; $('#gatePw').select(); }
+      $('#gateGo').disabled=false; $('#gateGo').textContent='כניסה'; };
+    $('#gateGo').onclick=go; $('#gatePw').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+  });
+}
+const OPS_KEY='tp_ops_v1';
+function localize(db){
+  const up=(arr,o,top)=>{ const i=arr.findIndex(x=>x.id===o.id); if(i>=0) Object.assign(arr[i],o); else top?arr.unshift(o):arr.push(o); return o; };
+  let seq=Date.now(); const nid=()=>++seq;
+  const ops={
+    saveEntry:e=>{ e.id=e.id||nid(); e.hours=e.hours??hrs(e.start_time,e.end_time); return up(S.entries,e); },
+    delEntry:id=>{ S.entries=S.entries.filter(x=>x.id!==id); },
+    saveProject:p=>{ p.id=p.id||nid(); const r=up(S.projects,p,true); reindex(); return r; },
+    saveClient:c=>{ c.id=c.id||nid(); const r=up(S.clients,c); reindex(); return r; },
+    saveContact:k=>{ k.id=k.id||nid(); return up(S.contacts,k); },
+    teamAdd:(p,s)=>{ let t=S.team.get(p); if(!t) S.team.set(p,t=new Set()); t.add(s); },
+    teamRemove:(p,s)=>{ S.team.get(p)?.delete(s); },
+  };
+  let log=[]; try{ log=JSON.parse(localStorage.getItem(OPS_KEY)||'[]'); }catch(e){}
+  log.forEach(([m,a])=>{ try{ ops[m](...a); }catch(e){} });
+  Object.keys(ops).forEach(m=>db[m]=async(...a)=>{ const r=ops[m](...a); log.push([m,JSON.parse(JSON.stringify(a))]);
+    try{ localStorage.setItem(OPS_KEY,JSON.stringify(log)); }catch(e){ toast('לא ניתן לשמור במחשב הזה'); } return r; });
+  ['saveFinance','saveIncr','delIncr'].forEach(k=>db[k]=async()=>RO());
+  db.signOut=async()=>{ try{ const m=JSON.parse(localStorage.getItem('tp_auth')||'null'); localStorage.setItem('tp_auth',JSON.stringify({n:m?.n})); }catch(e){} location.reload(); };
+  $('#demoReset').classList.remove('hide');
+  $('#demoReset').onclick=()=>askModal('<b>ביטול השינויים</b><br>למחוק את כל מה שהוספת או שינית בהתנסות במחשב הזה ולחזור לנתונים המקוריים?',[
+    {t:'מחק את השינויים שלי',c:'pri',f:()=>{ try{ localStorage.removeItem(OPS_KEY); }catch(e){} location.reload(); }},{t:'ביטול',f:()=>{}}]);
+}
+/* התקנה כאפליקציה (PWA) */
+let installEvt=null;
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); installEvt=e; ['#gateInstall','#appInstall'].forEach(x=>document.querySelector(x)?.classList.remove('hide')); });
+['#gateInstall','#appInstall'].forEach(x=>document.querySelector(x)?.addEventListener('click',async()=>{ if(!installEvt) return; installEvt.prompt(); await installEvt.userChoice; installEvt=null; ['#gateInstall','#appInstall'].forEach(y=>document.querySelector(y)?.classList.add('hide')); }));
+if('serviceWorker' in navigator && location.protocol==='https:' && document.querySelector('link[rel=manifest]')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+async function boot(){
+  const demo = !SUPABASE_ANON_KEY || new URLSearchParams(location.search).has('demo');
+  if(demo){
+    const tB=performance.now();
+    DB=demoDB; await DB.load(); $('#demoBar').classList.remove('hide');
+    if(REAL!==false && GATE){ localize(DB);
+      $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (נכון ל-05.11.2026) · ללא נתונים כספיים · מה שמוסיפים או משנים נשמר רק במחשב הזה ולא בשרת · `; $('#demoRole').value=me.role; }
+    else if(REAL!==false){ makeReadOnly(DB);
+      $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (נכון ל-05.11.2026) · ללא נתונים כספיים · קריאה בלבד, אין עדכונים · `; }
+    const byName=n=>S.staff.find(x=>x.full_name===n)?.id;
+    $('#demoRole').onchange=()=>{ const r=$('#demoRole').value; me.role=r;
+      if(GATE){ /* נשאר המשתמש שנכנס, רק התצוגה משתנה */ }
+      else if(REAL!==false){ me.staff_id = r==='team_lead'?byName('ליטל סרור'):r==='employee'?byName('מיכל ליבוביץ'):byName('יובל טיקטין'); }
+      else { me.staff_id = r==='team_lead'?3:r==='employee'?4:1; }
+      me.name=staffName(me.staff_id)||me.name; startApp(); };
+    startApp();
+    if(REAL!==false){ const sp=document.createElement('b'); sp.style.marginRight='auto'; sp.textContent=`נטען ומוצג תוך ${((performance.now()-tB)/1000).toFixed(1)} שניות`; $('#demoBar').appendChild(sp); }
+    return;
+  }
+  await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  DB = sbDB(sb);
+  const redirect = location.origin + location.pathname;
+  $('#btnMs').onclick = ()=>sb.auth.signInWithOAuth({provider:'azure',options:{scopes:'email',redirectTo:redirect}});
+  $('#btnMagic').onclick = async ()=>{ const e=$('#loginEmail').value.trim().toLowerCase(); if(!e.endsWith('@tiktin.com')) return toast('רק כתובת @tiktin.com');
+    const {error}=await sb.auth.signInWithOtp({email:e,options:{emailRedirectTo:redirect,shouldCreateUser:true}}); toast(error?('שגיאה: '+error.message):'נשלח קישור כניסה למייל'); };
+  const {data:{session}} = await sb.auth.getSession();
+  if(!session){ $('#login').classList.remove('hide'); return; }
+  try{ await DB.load(); startApp(); } catch(e){ $('#login').classList.remove('hide'); toast('אין הרשאה למערכת'); await sb.auth.signOut(); }
+}
+const TRIAL = (()=>{ try{ return JSON.parse(document.getElementById('trialCfg')?.textContent||'null'); }catch(e){ return null; } })();
+if(TRIAL) gate().then(boot); else boot();
+</script>
+</body>
+</html>
