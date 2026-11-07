@@ -112,6 +112,10 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 #gate .fld{margin-top:8px}
 #gate label.rem{display:flex;gap:6px;align-items:center;justify-content:flex-start;font-size:13px;margin-top:10px}
 #gateErr{color:var(--red);font-size:13px;min-height:18px;margin-top:6px}
+#gateMsg{color:#1a7f37;font-size:13px;margin-top:4px}
+#gate .glinks{margin-top:10px;font-size:13px}
+#gate .glinks a{color:var(--red-d);text-decoration:none}
+#gate .glinks a:hover{text-decoration:underline}
 #toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:8px 16px;border-radius:8px;opacity:0;transition:.3s;z-index:50}
 #toast.on{opacity:.92}
 #modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:60}
@@ -146,12 +150,29 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
     <img src="logo.png" alt="טיקטין">
     <h1>PROJECTS</h1>
     <div class="muted" style="font-size:13px">גרסת התנסות – כניסה עם סיסמה אישית</div>
-    <select id="gateUser" title="בחירת שם המשתמש"><option value="">מי נכנס/ת?</option></select>
-    <div class="fld"><input id="gatePw" type="password" placeholder="סיסמה" autocomplete="current-password" title="הסיסמה האישית שקיבלת במייל"><button class="x" tabindex="-1" title="נקה">✕</button></div>
-    <label class="rem" title="בפעם הבאה התוכנה תיפתח במחשב הזה בלי להקליד סיסמה"><input type="checkbox" id="gateRem" checked> זכור אותי במחשב הזה</label>
-    <div class="hide" id="gateUp" style="margin-top:8px;font-size:12px;text-align:right">קובץ הנתונים המוצפן (PROJECTS-data.json מתיקיית ההורדות):<br><input type="file" id="gateFile" accept=".json" title="בחירת קובץ הנתונים המוצפן להעלאה לשרת – פעם אחת"></div>
+    <div id="gateUserRow"><select id="gateUser" title="בחירת שם המשתמש"><option value="">מי נכנס/ת?</option></select></div>
+    <div id="gLogin">
+      <div class="fld"><input id="gatePw" type="password" placeholder="סיסמה" autocomplete="current-password" title="הסיסמה האישית שלך"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+      <label class="rem" title="במחשב הזה התוכנה תיפתח בלי סיסמה במשך 20 שעות מרגע הכניסה"><input type="checkbox" id="gateRem" checked> זכור אותי במחשב הזה ל-20 שעות</label>
+      <div class="hide" id="gateUp" style="margin-top:8px;font-size:12px;text-align:right">קובץ הנתונים המוצפן (PROJECTS-data.json מתיקיית ההורדות):<br><input type="file" id="gateFile" accept=".json" title="בחירת קובץ הנתונים המוצפן להעלאה לשרת – פעם אחת"></div>
+      <button class="btn pri" id="gateGo">כניסה</button>
+      <div class="glinks"><a href="javascript:void 0" id="gToChange" title="החלפת הסיסמה שקיבלת בסיסמה שתבחר/י">החלפת סיסמה</a> · <a href="javascript:void 0" id="gForgot" title="קבלת קישור במייל לקביעת סיסמה חדשה">שכחתי סיסמה</a></div>
+    </div>
+    <div id="gChange" class="hide">
+      <div class="fld"><input id="gOld" type="password" placeholder="הסיסמה הנוכחית (שקיבלת במייל)" autocomplete="current-password" title="הסיסמה הנוכחית – בפעם הראשונה זו הסיסמה שקיבלת במייל"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+      <div class="fld"><input id="gNew" type="password" placeholder="סיסמה חדשה (לפחות 8 תווים)" autocomplete="new-password" title="הסיסמה החדשה – לפחות 8 תווים"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+      <div class="fld"><input id="gNewC" type="password" placeholder="אימות הסיסמה החדשה" autocomplete="new-password" title="הקלד/י שוב את הסיסמה החדשה"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+      <button class="btn pri" id="gChangeGo">החלפת סיסמה</button>
+      <div class="glinks"><a href="javascript:void 0" id="gBack1" title="חזרה למסך הכניסה">חזרה לכניסה</a></div>
+    </div>
+    <div id="gReset" class="hide">
+      <div class="muted" style="font-size:13px;margin-top:10px">קביעת סיסמה חדשה</div>
+      <div class="fld"><input id="gNew2" type="password" placeholder="סיסמה חדשה (לפחות 8 תווים)" autocomplete="new-password" title="הסיסמה החדשה – לפחות 8 תווים"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+      <div class="fld"><input id="gNew2C" type="password" placeholder="אימות הסיסמה החדשה" autocomplete="new-password" title="הקלד/י שוב את הסיסמה החדשה"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+      <button class="btn pri" id="gResetGo">שמירת הסיסמה</button>
+    </div>
     <div id="gateErr"></div>
-    <button class="btn pri" id="gateGo">כניסה</button>
+    <div id="gateMsg"></div>
     <button class="btn hide" id="gateInstall" title="התקנת PROJECTS כאפליקציה במחשב – אייקון בשולחן העבודה ופתיחה בחלון נפרד">התקנה כאפליקציה במחשב</button>
     <div class="muted" style="margin-top:14px;font-size:11px" id="gateVer"></div>
   </div>
@@ -423,7 +444,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירוז", "אורטל", "מורן", "קובי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.17';
+const VERSION = '0.18';
 const VERSION_DATE = '07.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
@@ -970,11 +991,8 @@ async function rpc(fn,args){
   if(!r.ok){ const t=await r.text(); const e=new Error(t); e.status=r.status; throw e; }
   return r.json();
 }
-async function gateDecrypt(E,slot,pw){
-  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
-  const kek=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64d(slot.s),iterations:E.it,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
-  const dk=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(slot.i)},kek,b64d(slot.w)));
-  const k=await crypto.subtle.importKey('raw',dk,'AES-GCM',false,['decrypt']);
+async function gateDecrypt(E,k64){
+  const k=await crypto.subtle.importKey('raw',b64d(k64),'AES-GCM',false,['decrypt']);
   const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(E.iv)},k,b64d(E.ct));
   const txt=await new Response(new Blob([pt]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
   const el=document.createElement('script'); el.id='demoData'; el.type='application/json'; el.textContent=txt; document.body.appendChild(el);
@@ -982,15 +1000,28 @@ async function gateDecrypt(E,slot,pw){
 /* מטמון מקומי של הקובץ המוצפן – כדי שהפתיחה תהיה מהירה ולא יורדים הנתונים בכל פעם */
 async function cacheGet(){ try{ const c=await caches.open('tp-data'); const r=await c.match('./__data'); if(!r) return null; return {ver:r.headers.get('x-ver'), text:await r.text()}; }catch(e){ return null; } }
 async function cachePut(ver,text){ try{ const c=await caches.open('tp-data'); await c.put('./__data',new Response(text,{headers:{'x-ver':ver}})); }catch(e){} }
-async function gateOpen(n,pw,event){
-  const cached=await cacheGet();
-  const res=await rpc('demo_open',{p_user:n,p_pw:pw,p_event:event,p_ua:navigator.userAgent.slice(0,300),p_have:cached?.ver||null});
-  if(res.error){ const e=new Error('bad'); e.status=400; throw e; }
+const UA=()=>navigator.userAgent.slice(0,300);
+const lsGet=()=>{ try{ return JSON.parse(localStorage.getItem('tp_auth')||'null'); }catch(e){ return null; } };
+const lsSet=v=>{ try{ localStorage.setItem('tp_auth',JSON.stringify(v)); }catch(e){} };
+async function gateApply(n,res,cached){
+  if(res.error){ const e=new Error(res.error); e.status=400; throw e; }
   if(!res.ver) return {nodata:true};
   let text=res.data; if(text==null){ text=cached.text; } else cachePut(res.ver,text);
-  await gateDecrypt(JSON.parse(text),res,pw);
+  await gateDecrypt(JSON.parse(text),res.k);
   const i=TRIAL.users.indexOf(n); GATE={user:n,role:res.r,idx:i<0?0:i};
   return {ok:true};
+}
+async function gateOpen(n,pw,remember){
+  const cached=await cacheGet();
+  const res=await rpc('demo_open',{p_user:n,p_pw:pw,p_ua:UA(),p_have:cached?.ver||null,p_remember:!!remember});
+  const r=await gateApply(n,res,cached);
+  if(r.ok) lsSet(res.token?{n,t:res.token,exp:res.exp}:{n});
+  return r;
+}
+async function gateResume(m){
+  const cached=await cacheGet();
+  const res=await rpc('demo_resume',{p_token:m.t,p_ua:UA(),p_have:cached?.ver||null});
+  return gateApply(res.n||m.n,res,cached);
 }
 async function gateUpload(n,pw,file){
   const text=await file.text(); const E=JSON.parse(text); if(!E.ct||!E.iv) throw new Error('קובץ לא תקין');
@@ -999,30 +1030,64 @@ async function gateUpload(n,pw,file){
     await rpc('demo_put',{p_user:n,p_pw:pw,p_k:'data_new',p_v:text.slice(i,i+CH),p_append:i>0}); }
   await rpc('demo_put',{p_user:n,p_pw:pw,p_k:'commit',p_v:E.ver||String(Date.now()),p_append:false});
 }
+function gateMode(mode){ /* login | change | forgot | reset */
+  ['#gLogin','#gChange','#gReset'].forEach(x=>$(x).classList.add('hide'));
+  $(mode==='change'?'#gChange':mode==='reset'?'#gReset':'#gLogin').classList.remove('hide');
+  $('#gateUserRow').classList.toggle('hide',mode==='reset');
+  $('#gateErr').textContent=''; $('#gateMsg').textContent='';
+}
+const errMsg=e=> !e.status ? 'אין חיבור לשרת – בדוק/י את האינטרנט ונסה/י שוב'
+  : /bad|denied/.test(e.message) ? 'סיסמה שגויה' : /short/.test(e.message) ? 'הסיסמה החדשה קצרה מדי – לפחות 8 תווים'
+  : /invalid/.test(e.message) ? 'הקישור לא בתוקף או שכבר נוצל – בקש/י קישור חדש' : /expired/.test(e.message) ? 'פג תוקף הכניסה השמורה – היכנס/י שוב'
+  : 'שגיאה: '+e.message.slice(0,120);
 async function gate(){
-  let m=null; try{ m=JSON.parse(localStorage.getItem('tp_auth')||'null'); }catch(e){}
-  if(m?.p && TRIAL.users.includes(m.n)){
-    try{ const r=await gateOpen(m.n,m.p,'open'); if(r.ok) return; }catch(e){ if(e.status) { try{ localStorage.removeItem('tp_auth'); }catch(_){} } }
-  }
+  const m=lsGet();
+  const resetTok=new URLSearchParams(location.search).get('reset');
+  if(!resetTok && m?.t && m.exp>Date.now() && TRIAL.users.includes(m.n)){
+    try{ const r=await gateResume(m); if(r.ok) return; }catch(e){ if(e.status) lsSet({n:m.n}); }
+  } else if(m?.t){ lsSet({n:m.n}); }
   $('#gateVer').textContent=`גרסה ${VERSION} · עודכן ${VERSION_DATE}`;
   $('#gateUser').innerHTML='<option value="">מי נכנס/ת?</option>'+TRIAL.users.map(u=>`<option>${esc(u)}</option>`).join('');
   if(m?.n) $('#gateUser').value=m.n;
-  $('#gate').classList.remove('hide'); (m?.n?$('#gatePw'):$('#gateUser')).focus();
+  $('#gate').classList.remove('hide');
+  gateMode(resetTok?'reset':'login'); (resetTok?$('#gNew2'):m?.n?$('#gatePw'):$('#gateUser')).focus();
+  const busy=(b,btn,txt)=>{ btn.disabled=b; if(txt) btn.textContent=txt; };
   await new Promise(done=>{
-    const go=async()=>{ const n=$('#gateUser').value, pw=$('#gatePw').value; $('#gateErr').textContent='';
-      if(!n) return $('#gateErr').textContent='בחר/י שם';
-      if(!pw) return $('#gateErr').textContent='הקלד/י סיסמה';
-      $('#gateGo').disabled=true; $('#gateGo').textContent='פותח…';
+    const err=t=>{ $('#gateErr').textContent=t; }, msg=t=>{ $('#gateMsg').textContent=t; };
+    const go=async()=>{ const n=$('#gateUser').value, pw=$('#gatePw').value; err(''); msg('');
+      if(!n) return err('בחר/י שם'); if(!pw) return err('הקלד/י סיסמה');
+      busy(true,$('#gateGo'),'פותח…');
       try{
         const f=$('#gateFile').files[0];
         if(f){ await gateUpload(n,pw,f); $('#gateFile').value=''; }
-        const r=await gateOpen(n,pw,'login');
-        if(r.nodata){ $('#gateErr').textContent='הנתונים עדיין לא הועלו לשרת'+(n==='יובל'?' – בחר את קובץ הנתונים והקש כניסה':''); $('#gateUp').classList.toggle('hide',n!=='יובל'); }
-        else { try{ localStorage.setItem('tp_auth',JSON.stringify($('#gateRem').checked?{n,p:pw}:{n})); }catch(e){}
-          $('#gate').classList.add('hide'); done(); }
-      }catch(e){ $('#gateErr').textContent = e.status ? (/denied|bad/.test(e.message)?'סיסמה שגויה':'שגיאה: '+e.message.slice(0,120)) : 'אין חיבור לשרת – בדוק את האינטרנט ונסה שוב'; $('#gatePw').select(); }
-      $('#gateGo').disabled=false; $('#gateGo').textContent='כניסה'; };
+        const r=await gateOpen(n,pw,$('#gateRem').checked);
+        if(r.nodata){ err('הנתונים עדיין לא הועלו לשרת'+(n==='יובל'?' – בחר את קובץ הנתונים והקש כניסה':'')); $('#gateUp').classList.toggle('hide',n!=='יובל'); }
+        else { $('#gate').classList.add('hide'); done(); }
+      }catch(e){ err(errMsg(e)); $('#gatePw').select(); }
+      busy(false,$('#gateGo'),'כניסה'); };
     $('#gateGo').onclick=go; $('#gatePw').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+    $('#gToChange').onclick=()=>{ gateMode('change'); $('#gOld').value=$('#gatePw').value; ($('#gOld').value?$('#gNew'):$('#gOld')).focus(); };
+    $('#gBack1').onclick=()=>gateMode('login');
+    $('#gChangeGo').onclick=async()=>{ const n=$('#gateUser').value, o=$('#gOld').value, a=$('#gNew').value, b=$('#gNewC').value; err(''); msg('');
+      if(!n) return err('בחר/י שם'); if(!o) return err('הקלד/י את הסיסמה הנוכחית (זו שקיבלת במייל)');
+      if(a.length<8) return err('הסיסמה החדשה קצרה מדי – לפחות 8 תווים'); if(a!==b) return err('הסיסמה החדשה ואימות הסיסמה לא זהים');
+      busy(true,$('#gChangeGo'),'מחליף…');
+      try{ const r=await rpc('demo_change_pw',{p_user:n,p_old:o,p_new:a,p_ua:UA()}); if(r.error){ const e=new Error(r.error); e.status=400; throw e; }
+        ['#gOld','#gNew','#gNewC','#gatePw'].forEach(x=>$(x).value=''); gateMode('login'); msg('הסיסמה הוחלפה – היכנס/י עם הסיסמה החדשה'); $('#gatePw').focus();
+      }catch(e){ err(errMsg(e)); }
+      busy(false,$('#gChangeGo'),'החלפת סיסמה'); };
+    $('#gForgot').onclick=async()=>{ const n=$('#gateUser').value; err(''); msg('');
+      if(!n) return err('בחר/י קודם את השם שלך');
+      try{ await rpc('demo_reset_request',{p_user:n,p_ua:UA()}); msg('קישור לקביעת סיסמה חדשה יישלח למייל שלך בתוך שעה (בימים א׳–ה׳ בין 08:00 ל-20:00). הקישור בתוקף 72 שעות.'); }
+      catch(e){ err(errMsg(e)); } };
+    $('#gResetGo').onclick=async()=>{ const a=$('#gNew2').value, b=$('#gNew2C').value; err(''); msg('');
+      if(a.length<8) return err('הסיסמה החדשה קצרה מדי – לפחות 8 תווים'); if(a!==b) return err('הסיסמה ואימות הסיסמה לא זהים');
+      busy(true,$('#gResetGo'),'שומר…');
+      try{ const r=await rpc('demo_reset_do',{p_token:resetTok,p_new:a,p_ua:UA()}); if(r.error){ const e=new Error(r.error); e.status=400; throw e; }
+        history.replaceState(null,'',location.pathname); if(r.n) $('#gateUser').value=r.n;
+        ['#gNew2','#gNew2C'].forEach(x=>$(x).value=''); gateMode('login'); msg('הסיסמה נקבעה – היכנס/י עם הסיסמה החדשה'); $('#gatePw').focus();
+      }catch(e){ err(errMsg(e)); }
+      busy(false,$('#gResetGo'),'שמירת הסיסמה'); };
   });
 }
 const OPS_KEY='tp_ops_v1';
@@ -1043,7 +1108,7 @@ function localize(db){
   Object.keys(ops).forEach(m=>db[m]=async(...a)=>{ const r=ops[m](...a); log.push([m,JSON.parse(JSON.stringify(a))]);
     try{ localStorage.setItem(OPS_KEY,JSON.stringify(log)); }catch(e){ toast('לא ניתן לשמור במחשב הזה'); } return r; });
   ['saveFinance','saveIncr','delIncr'].forEach(k=>db[k]=async()=>RO());
-  db.signOut=async()=>{ try{ const m=JSON.parse(localStorage.getItem('tp_auth')||'null'); localStorage.setItem('tp_auth',JSON.stringify({n:m?.n})); }catch(e){} location.reload(); };
+  db.signOut=async()=>{ const m=lsGet(); lsSet({n:m?.n}); location.reload(); };
   $('#demoReset').classList.remove('hide');
   $('#demoReset').onclick=()=>askModal('<b>ביטול השינויים</b><br>למחוק את כל מה שהוספת או שינית בהתנסות במחשב הזה ולחזור לנתונים המקוריים?',[
     {t:'מחק את השינויים שלי',c:'pri',f:()=>{ try{ localStorage.removeItem(OPS_KEY); }catch(e){} location.reload(); }},{t:'ביטול',f:()=>{}}]);
