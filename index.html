@@ -174,7 +174,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
     <div id="gateUserRow"><select id="gateUser" title="בחירת שם המשתמש"><option value="">מי נכנס/ת?</option></select></div>
     <div id="gLogin">
       <div class="fld"><input id="gatePw" type="password" placeholder="סיסמה" autocomplete="current-password" title="הסיסמה האישית שלך"><button class="x" tabindex="-1" title="נקה">✕</button></div>
-      <label class="rem" title="במחשב הזה התוכנה תיפתח בלי סיסמה במשך 20 שעות מרגע הכניסה"><input type="checkbox" id="gateRem" checked> זכור אותי במחשב הזה ל-20 שעות</label>
+      <label class="rem" title="במחשב הזה התוכנה תיפתח בלי סיסמה במשך 20 שעות מרגע הכניסה"><input type="checkbox" id="gateRem" checked> זכור אותי במחשב הזה <span id="gateRemT">ל-20 שעות</span></label>
       <div class="hide" id="gateUp" style="margin-top:8px;font-size:12px;text-align:right">קובץ הנתונים המוצפן (PROJECTS-data.json מתיקיית ההורדות):<br><input type="file" id="gateFile" accept=".json" title="בחירת קובץ הנתונים המוצפן להעלאה לשרת – פעם אחת"></div>
       <button class="btn pri" id="gateGo">כניסה</button>
       <div class="glinks"><a href="javascript:void 0" id="gToChange" title="החלפת הסיסמה שקיבלת בסיסמה שתבחר/י">החלפת סיסמה</a> · <a href="javascript:void 0" id="gForgot" title="קבלת קישור במייל לקביעת סיסמה חדשה">שכחתי סיסמה</a></div>
@@ -490,7 +490,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.28';
+const VERSION = '0.29';
 const VERSION_DATE = '08.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
@@ -1254,6 +1254,8 @@ async function gate(){
   $('#gateVer').textContent=`גרסה ${VERSION} · עודכן ${VERSION_DATE}`;
   $('#gateUser').innerHTML='<option value="">מי נכנס/ת?</option>'+TRIAL.users.map(u=>`<option>${esc(u)}</option>`).join('');
   if(m?.n) $('#gateUser').value=m.n;
+  const remT=()=>{ const y=$('#gateUser').value==='יובל'; $('#gateRemT').textContent=y?'ל-10 ימים':'ל-20 שעות'; $('#gateRem').parentElement.title=`במחשב הזה התוכנה תיפתח בלי סיסמה במשך ${y?'10 ימים':'20 שעות'} מרגע הכניסה`; };
+  $('#gateUser').addEventListener('change',remT); remT();
   $('#gate').classList.remove('hide');
   gateMode(resetTok?'reset':'login'); (resetTok?$('#gNew2'):m?.n?$('#gatePw'):$('#gateUser')).focus();
   const busy=(b,btn,txt)=>{ btn.disabled=b; if(txt) btn.textContent=txt; };
