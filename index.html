@@ -230,7 +230,9 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
   <div class="demo hide" id="demoBar">
     <b>מצב הדגמה</b> – נתונים לדוגמה, שום דבר לא נשמר בשרת.
     <span>הצג כ:</span>
-    <select id="demoRole"><option value="management">הנהלה</option><option value="finance">כספים</option><option value="secretary">מזכירות</option><option value="team_lead">ראש צוות</option><option value="employee">עובד</option></select>
+    <select id="demoRole" title="התפקיד שהתוכנה מתנהגת לפיו"><option value="management">הנהלה</option><option value="finance">כספים</option><option value="secretary">מזכירות</option><option value="team_lead">ראש צוות</option><option value="employee">עובד</option></select>
+    <span id="demoWhoL" class="hide">עובד:</span>
+    <select id="demoWho" class="hide" title="התנסות כאילו העובד הזה מפעיל את התוכנה"></select>
     <button class="btn sm hide" id="demoReset" title="מחיקת כל מה שהוספת או שינית בהתנסות במחשב הזה – חזרה לנתונים המקוריים">ביטול השינויים שלי</button>
     <button class="btn sm hide" id="appInstall" title="התקנת PROJECTS כאפליקציה במחשב – אייקון בשולחן העבודה ופתיחה בחלון נפרד">התקנה במחשב</button>
   </div>
@@ -304,12 +306,15 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
         <div class="sp"></div>
         <label class="f">פרויקט
           <div class="fld"><select id="hScope" title="להציג רק את הדיווחים של הפרויקט שנבחר, או את כל הפרויקטים"><option value="proj">הפרויקט הנבחר</option><option value="all">כל הפרויקטים</option></select></div></label>
+        <button class="btn hide" id="hAllEmp" title="ראש צוות: להציג גם את השעות של עובדים מחוץ לצוות שלך בפרויקט הזה">הצג את כל העובדים בפרויקט</button>
         <label class="f" id="hWhoWrap">עובד
           <div class="fld"><select id="hWho"></select></div></label>
         <label class="f">מתאריך<div class="fld"><input id="hFrom" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
         <label class="f">עד תאריך<div class="fld"><input id="hTo" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
       </div>
       <div class="tblwrap"><table id="hTable"></table></div>
+      <div id="hSumWrap" class="hide" style="margin-top:10px"><h3 style="margin:0 0 6px">סה"כ שעות לכל עובד בפרויקט</h3>
+        <div class="tblwrap" style="max-height:260px"><table id="hSum"></table></div></div>
       <div class="bar" style="margin-top:8px">
         <span class="tot" id="hTotal"></span><div class="sp"></div>
         <button class="btn" data-reset="hours" title="איפוס כל השדות והסינונים">איפוס טופס</button>
@@ -483,7 +488,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.26';
+const VERSION = '0.27';
 const VERSION_DATE = '08.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
@@ -626,9 +631,20 @@ const projByLabel = v => IX.lbl.get(v) || IX.lbl.get((v||'').trim());
 const clientName = id => IX.c.get(id)?.name||'';
 const clientByName = n => S.clients.find(c=>c.name===n.trim());
 const staffName = id => IX.s.get(id)?.full_name||'';
+/* צוותים – זמני, עד שטבלת ההרשאות (עץ הצוותים) תושלם */
+const TEAMS = {'מורן איגניץ':['הדסה גרשוני']};
+const ROLE_BY_NAME = {'יובל טיקטין':'management','נדב טיקטין':'management','אמיר טיקטין':'management','ערבה טיקטין':'management','ליטל סרור':'team_lead','מורן איגניץ':'team_lead','קובי שקפטי':'team_lead'};
+const inMyTeam = s => s.id===me.staff_id || s.team_lead===me.staff_id || s.team_lead_profile===me.staff_id || (TEAMS[staffName(me.staff_id)]||[]).includes(s.full_name);
+let hAllEmp=false;
+/* מי מופיע במסך השעות: הנהלה/כספים/מזכירות – כולם; ראש צוות – הצוות שלו (או כולם בלחיצה, כשנבחר פרויקט); עובד – רק הוא */
+const hoursStaff = () => {
+  if(['management','finance','secretary'].includes(me.role)) return S.staff;
+  if(me.role==='team_lead') return (hAllEmp && curProj) ? S.staff : S.staff.filter(inMyTeam);
+  return S.staff.filter(s=>s.id===me.staff_id);
+};
 const visibleStaff = () => {
   if(isMgmt()) return S.staff;
-  if(me.role==='team_lead') return S.staff.filter(s=>s.id===me.staff_id || s.team_lead===me.staff_id || s.team_lead_profile===me.staff_id);
+  if(me.role==='team_lead') return S.staff.filter(inMyTeam);
   return S.staff.filter(s=>s.id===me.staff_id);
 };
 function fillDatalists(){
@@ -680,12 +696,19 @@ function initHours(){
   $('#hDate').value = today();
   const d = new Date(); const day=d.getDay(); const sun = new Date(d); sun.setDate(d.getDate()-day);
   $('#hFrom').value = localISO(sun); $('#hTo').value = today();
-  const vs = visibleStaff();
-  $('#hWho').innerHTML = (vs.length>1?'<option value="">כל העובדים שלי</option>':'') + vs.map(s=>`<option value="${s.id}" ${(s.id===me.staff_id && !isMgmt())?'selected':''}>${esc(s.full_name)}</option>`).join('');
-  $('#hWhoWrap').classList.toggle('hide', vs.length<=1);
+  $('#hWho').innerHTML=''; fillHoursWho();
   loadTimer(); if(timer?.planned) $('#hAutoAt').value=hhmm(timer.planned);
   renderTimer(); renderHours(); tick();
 }
+function fillHoursWho(){
+  const vs = hoursStaff().slice().sort((a,b)=>COLL.compare(a.full_name,b.full_name)), cur=$('#hWho').querySelector('option[value=""]') ? $('#hWho').value : '';
+  $('#hWho').innerHTML = (vs.length>1?`<option value="">${me.role==='team_lead'&&!hAllEmp?'כל הצוות שלי':'כל העובדים'}</option>`:'') + vs.map(s=>`<option value="${s.id}">${esc(s.full_name)}</option>`).join('');
+  if(cur && vs.some(s=>s.id==cur)) $('#hWho').value=cur;
+  $('#hWhoWrap').classList.toggle('hide', vs.length<=1);
+  const tl = me.role==='team_lead' && !!curProj; $('#hAllEmp').classList.toggle('hide',!tl);
+  $('#hAllEmp').textContent = hAllEmp ? 'הצג רק את הצוות שלי' : 'הצג את כל העובדים בפרויקט'; $('#hAllEmp').classList.toggle('on',hAllEmp);
+}
+$('#hAllEmp').onclick=()=>{ hAllEmp=!hAllEmp; fillHoursWho(); renderHours(); };
 /* planned end from the fields: "בשעה" or "בעוד שעות/דקות" */
 function plannedFromFields(base){
   const at=norm24($('#hAutoAt').value)||'', h=+($('#hAutoH').value||0), m=+($('#hAutoM').value||0);
@@ -778,17 +801,22 @@ function askModal(html,btns){
 ['#hWho','#hFrom','#hTo','#hScope'].forEach(s=>$(s).addEventListener('change',renderHours));
 function renderHours(){
   const who=$('#hWho').value, f=$('#hFrom').value, t=$('#hTo').value;
-  const vis = new Set(visibleStaff().map(s=>s.id));
+  if(me.role==='team_lead' && !curProj && hAllEmp){ hAllEmp=false; } fillHoursWho();
+  const vis = new Set(hoursStaff().map(s=>s.id));
   const pp = $('#hScope').value==='proj' ? (timer?projById(timer.project_id):curProj) : null, pid = pp?.id ?? null;
   const rows = S.entries.filter(e=>vis.has(e.staff_id) && (!pid||e.project_id===pid) && (!who||e.staff_id==who) && (!f||e.work_date>=f) && (!t||e.work_date<=t))
     .sort((a,b)=>(b.work_date+b.start_time).localeCompare(a.work_date+a.start_time));
-  const multi = !who && visibleStaff().length>1;
+  const multi = !who && hoursStaff().length>1;
+  const byEmp=new Map(); rows.forEach(e=>{ const o=byEmp.get(e.staff_id)||{h:0,n:0,f:e.work_date,l:e.work_date}; o.h+=+(e.hours??hrs(e.start_time,e.end_time)??0); o.n++; if(e.work_date<o.f) o.f=e.work_date; if(e.work_date>o.l) o.l=e.work_date; byEmp.set(e.staff_id,o); });
+  const showSum = !!pp && byEmp.size>0; $('#hSumWrap').classList.toggle('hide',!showSum);
+  if(showSum){ const dd=d=>d.split('-').reverse().join('.'); const arr=[...byEmp.entries()].sort((a,b)=>b[1].h-a[1].h);
+    $('#hSum').innerHTML='<thead><tr><th>עובד</th><th class="num">דיווחים</th><th class="num">שעות</th><th class="hide-m">מתאריך</th><th class="hide-m">עד תאריך</th></tr></thead><tbody>'+arr.map(([s,o])=>`<tr><td>${esc(staffName(s))}</td><td class="num">${o.n}</td><td class="num"><b>${o.h.toFixed(2)}</b></td><td class="hide-m">${dd(o.f)}</td><td class="hide-m">${dd(o.l)}</td></tr>`).join('')+`<tr><th>סה"כ</th><th class="num">${rows.length}</th><th class="num">${arr.reduce((a,x)=>a+x[1].h,0).toFixed(2)}</th><th class="hide-m"></th><th class="hide-m"></th></tr></tbody>`; }
   let tot=0; rows.forEach(e=>tot+= +(e.hours??hrs(e.start_time,e.end_time)??0));
   const LIM=800, shown=rows.slice(0,LIM);
-  $('#hTable').innerHTML = `<thead><tr><th>תאריך</th>${multi?'<th>עובד</th>':''}<th>פרויקט</th><th>התחלה</th><th>סיום</th><th class="num">שעות</th><th class="hide-m">הערה</th><th class="noprint"></th></tr></thead><tbody>`+
+  $('#hTable').innerHTML = `<thead><tr><th>תאריך</th>${multi?'<th>עובד</th>':''}<th>פרויקט</th><th>התחלה</th><th>סיום</th><th class="num">שעות</th><th>מה עשה</th><th class="noprint"></th></tr></thead><tbody>`+
     shown.map(e=>{ const p=projById(e.project_id); const h=e.hours??hrs(e.start_time,e.end_time)??0;
       const mine = REAL===false && (e.staff_id===me.staff_id || isMgmt());
-      return `<tr><td>${e.work_date.split('-').reverse().join('.')}</td>${multi?`<td>${esc(staffName(e.staff_id))}</td>`:''}<td>${esc(projLabel(p))}</td><td>${e.start_time?.slice(0,5)||''}</td><td>${e.end_time?.slice(0,5)||''}</td><td class="num">${(+h).toFixed(2)}</td><td class="hide-m">${esc(e.notes)}</td>
+      return `<tr><td>${e.work_date.split('-').reverse().join('.')}</td>${multi?`<td>${esc(staffName(e.staff_id))}</td>`:''}<td>${esc(projLabel(p))}</td><td>${e.start_time?.slice(0,5)||''}</td><td>${e.end_time?.slice(0,5)||''}</td><td class="num">${(+h).toFixed(2)}</td><td>${esc(e.notes)}</td>
       <td class="noprint">${mine?`<button class="btn sm" data-ed="${e.id}" title="עריכה">✎</button> <button class="btn sm" data-del="${e.id}" title="מחיקה">🗑</button>`:''}</td></tr>`}).join('')+'</tbody>';
   $('#hTotal').textContent = `סה"כ: ${tot.toFixed(2)} שעות · ${rows.length.toLocaleString('he-IL')} דיווחים`+(pp?` · פרויקט ${pp.iso_number||''}`:($('#hScope').value==='proj'?' · כל הפרויקטים (לא נבחר פרויקט)':''))+(rows.length>LIM?` (מוצגים ${LIM} אחרונים – צמצם תאריכים או עובד)`:'');
   $$('#hTable [data-del]').forEach(b=>b.onclick=async()=>{ await DB.delEntry(+b.dataset.del); renderHours(); toast('נמחק'); });
@@ -809,7 +837,7 @@ let showAll=null;
 const inTeam=(p,sid)=>{ const t=S.team&&S.team.get(p.id); return !!(t&&t.has(sid)); };
 function myProjectIds(){
   const ids=new Set([me.staff_id]);
-  if(me.role==='team_lead') S.staff.forEach(s=>{ if(s.team_lead===me.staff_id) ids.add(s.id); });
+  if(me.role==='team_lead') S.staff.forEach(s=>{ if(inMyTeam(s)) ids.add(s.id); });
   return ids;
 }
 $('#pScope').onclick=()=>{ showAll=!showAll; renderProjects(); };
@@ -855,6 +883,7 @@ function selectProject(p){
   $('#selClear').classList.toggle('hide',!p);
   $('#selBoq').classList.toggle('hide',!p || !p.iso_number || !canBoq());
   $$('#pTable tr.sel').forEach(tr=>tr.classList.remove('sel')); if(p){ const tr=$(`#pTable tr[data-id="${p.id}"]`); tr&&tr.classList.add('sel'); }
+  if(hAllEmp && me.role==='team_lead'){ hAllEmp=false; }
   syncHoursProject();
 }
 $('#selBoq').onclick=()=>{ const p=curProj; if(!p||!p.iso_number) return;
@@ -1302,7 +1331,10 @@ async function boot(){
     const tB=performance.now();
     DB=demoDB; await DB.load(); $('#demoBar').classList.remove('hide');
     if(REAL!==false && GATE){ mergeSync(); /* קודם הסנכרון, ואז השינויים המקומיים – כך מה שהמשתמש הוסיף או שינה גובר */ localize(DB); const AS=new Set(GATE.arch); S.projects.forEach(p=>p.archived=AS.has(p.id)||!!p._arch);
-      $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (${GATE.syncAt?'מתעדכן כל לילה, עדכון אחרון '+new Date(GATE.syncAt).toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'נכון ל-05.11.2026'}) · ללא נתונים כספיים · מה שמוסיפים או משנים נשמר רק במחשב הזה ולא בשרת · `; $('#demoRole').value=me.role; $('#demoRole').classList.toggle('hide',!GATE.sw); $('#demoRole').previousElementSibling.classList.toggle('hide',!GATE.sw); }
+      $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (${GATE.syncAt?'מתעדכן כל לילה, עדכון אחרון '+new Date(GATE.syncAt).toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'נכון ל-05.11.2026'}) · ללא נתונים כספיים · מה שמוסיפים או משנים נשמר רק במחשב הזה ולא בשרת · `; $('#demoRole').value=me.role; $('#demoRole').classList.toggle('hide',!GATE.sw); $('#demoRole').previousElementSibling.classList.toggle('hide',!GATE.sw);
+      if(GATE.sw){ const act=S.staff.filter(s=>s.active||s.id===me.staff_id).sort((a,b)=>COLL.compare(a.full_name,b.full_name));
+        $('#demoWho').innerHTML=act.map(s=>`<option value="${s.id}">${esc(s.full_name)}</option>`).join(''); $('#demoWho').value=me.staff_id??''; ['#demoWho','#demoWhoL'].forEach(x=>$(x).classList.remove('hide'));
+        $('#demoWho').onchange=()=>{ const s=IX.s.get(+$('#demoWho').value); if(!s) return; me.staff_id=s.id; me.name=s.full_name; me.role=ROLE_BY_NAME[s.full_name]||'employee'; $('#demoRole').value=me.role; hAllEmp=false; startApp(); toast(`מתנסה כ: ${s.full_name} – ${ROLE_HE[me.role]}. אפשר לשנות גם את התפקיד ליד.`); }; } }
     else if(REAL!==false){ makeReadOnly(DB);
       $('#demoBar').firstElementChild.nextSibling.textContent=` – נתונים אמיתיים מהרבסט וממאסטר פלאן (נכון ל-05.11.2026) · ללא נתונים כספיים · קריאה בלבד, אין עדכונים · `; }
     const byName=n=>S.staff.find(x=>x.full_name===n)?.id;
