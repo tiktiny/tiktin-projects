@@ -68,6 +68,10 @@ label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mu
 .fld .x{position:absolute;left:6px;top:50%;transform:translateY(-50%);border:none;background:none;color:#9aa0a6;cursor:pointer;font-size:15px;line-height:1;padding:2px}
 .fld textarea+.x{top:14px}
 .fld .x:hover{color:var(--red)}
+.fld input.dmy{direction:ltr;text-align:right;padding-left:54px;font-variant-numeric:tabular-nums}
+.fld input.dnat{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;padding:0;border:0;left:34px;bottom:0}
+.fld .cal{position:absolute;left:28px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;font-size:14px;line-height:1;padding:2px;opacity:.75}
+.fld .cal:hover{opacity:1}
 input:focus,select:focus,textarea:focus{outline:2px solid #f5b7b9;border-color:var(--red)}
 .checks{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;min-height:var(--h)}
 .checks label{display:flex;gap:5px;align-items:center;font-size:13px;color:var(--ink)}
@@ -502,7 +506,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.30';
+const VERSION = '0.31';
 const VERSION_DATE = '08.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
@@ -667,8 +671,30 @@ function fillDatalists(){
   $('#clientList').innerHTML = S.clients.map(c=>`<option value="${esc(c.name)}">`).join('');
 }
 
+/* תאריכים בפורמט DD/MM/YYYY בכל מחשב (שדה התאריך של הדפדפן מוצג לפי שפת המחשב) – הערך הפנימי נשאר YYYY-MM-DD */
+const DESC_VAL=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');
+function enhanceDates(root=document){
+  root.querySelectorAll('.fld input[type=date]').forEach(n=>{ if(n._dm) return; n._dm=1;
+    const t=document.createElement('input'); t.className='dmy'; t.placeholder='DD/MM/YYYY'; t.inputMode='numeric'; t.maxLength=10; t.autocomplete='off'; t.title='תאריך – יום/חודש/שנה';
+    const cal=document.createElement('button'); cal.type='button'; cal.className='cal'; cal.tabIndex=-1; cal.title='בחירה מלוח שנה'; cal.textContent='📅';
+    n.classList.add('dnat'); n.tabIndex=-1; n.before(t); n.parentElement.appendChild(cal);
+    const fmt=v=>v?v.split('-').reverse().join('/'):'';
+    const sync=()=>{ t.value=fmt(DESC_VAL.get.call(n)); t.classList.remove('bad'); };
+    Object.defineProperty(n,'value',{configurable:true,get(){ return DESC_VAL.get.call(n); },set(v){ DESC_VAL.set.call(n,v); sync(); }});
+    n.addEventListener('input',sync); n.addEventListener('change',sync); n.addEventListener('focus',()=>t.focus());
+    const parse=s=>{ s=String(s||'').trim(); if(!s) return ''; let m=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})$/)||s.match(/^(\d{2})(\d{2})(\d{4})$/); if(!m) return null;
+      let [,d,mo,y]=m; if(y.length===2) y='20'+y; const iso=`${y}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`; const D=new Date(iso+'T12:00'); return (isNaN(D)||D.getDate()!==+d||D.getMonth()+1!==+mo)?null:iso; };
+    const commit=()=>{ const iso=parse(t.value); if(iso===null){ t.classList.add('bad'); return; } t.classList.remove('bad');
+      if(iso!==DESC_VAL.get.call(n)){ DESC_VAL.set.call(n,iso); n.dispatchEvent(new Event('input',{bubbles:true})); n.dispatchEvent(new Event('change',{bubbles:true})); } t.value=fmt(iso); };
+    t.addEventListener('change',commit); t.addEventListener('keydown',e=>{ if(e.key==='Enter') commit(); });
+    t.addEventListener('input',()=>{ if(!t.value || (t.value.length>=8 && parse(t.value))) commit(); });
+    cal.onclick=()=>{ try{ n.showPicker(); }catch(e){ try{ n.click(); }catch(_){} } };
+    sync();
+  });
+}
 /* inputs: X clear buttons + first keystroke overwrites */
 function wireInputs(root=document){
+  enhanceDates(root);
   root.querySelectorAll('input.t24').forEach(i=>{ if(i._t) return; i._t=1; });
   root.querySelectorAll('.fld .x').forEach(b=>{ if(b._w) return; b._w=1;
     b.addEventListener('click',()=>{ const i=b.previousElementSibling; i.value=''; i.dispatchEvent(new Event('input',{bubbles:true})); i.dispatchEvent(new Event('change',{bubbles:true})); i.focus(); }); });
