@@ -509,7 +509,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.32';
+const VERSION = '0.33';
 const VERSION_DATE = '08.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
@@ -755,7 +755,7 @@ function loadTimer(){ try{ const t=JSON.parse(localStorage.getItem('tk_timer')||
 function initHours(){
   $('#hDate').value = today();
   const d = new Date(); const day=d.getDay(); const sun = new Date(d); sun.setDate(d.getDate()-day);
-  $('#hFrom').value = localISO(sun); $('#hTo').value = today(); hQ='';
+  $('#hFrom').value = localISO(sun); $('#hTo').value = today(); hQ='w';
   $('#hWho').innerHTML=''; fillHoursWho();
   loadTimer(); if(timer?.planned) $('#hAutoAt').value=hhmm(timer.planned);
   renderTimer(); renderHours(); tick();
@@ -869,6 +869,7 @@ $$('#hQuick [data-q]').forEach(b=>b.onclick=()=>{ const q=b.dataset.q; if(q==='p
 function renderHours(){
   if(hQ){ const f=hQuickRange(hQ); if(f){ $('#hFrom').value=f; $('#hTo').value=today(); } }
   $$('#hQuick [data-q]').forEach(x=>x.classList.toggle('on',x.dataset.q===hQ));
+  { const hasP=!!(timer||curProj), sc=$('#hScope'); if(!hasP){ sc.value='all'; sc.disabled=true; sc.title='לא נבחר פרויקט – מוצגים כל הפרויקטים'; } else if(sc.disabled){ sc.disabled=false; sc.value='proj'; sc.title='להציג רק את הדיווחים של הפרויקט שנבחר, או את כל הפרויקטים'; } }
   const who=$('#hWho').value, f=$('#hFrom').value, t=$('#hTo').value;
   if(me.role==='team_lead' && !curProj && hAllEmp){ hAllEmp=false; } fillHoursWho();
   const vis = new Set(hoursStaff().map(s=>s.id));
@@ -886,7 +887,7 @@ function renderHours(){
     shown.map(e=>{ const p=projById(e.project_id); const h=e.hours??hrs(e.start_time,e.end_time)??0;
       const mine = REAL===false && (e.staff_id===me.staff_id || isMgmt());
       return `<tr><td>${e.work_date.split('-').reverse().join('.')}</td>${multi?`<td>${esc(staffName(e.staff_id))}</td>`:''}<td>${esc(projLabel(p))}</td><td>${e.start_time?.slice(0,5)||''}</td><td>${e.end_time?.slice(0,5)||''}</td><td class="num">${(+h).toFixed(2)}</td><td>${esc(e.notes)}</td>
-      <td class="noprint">${mine?`<button class="btn sm" data-ed="${e.id}" title="עריכה">✎</button> <button class="btn sm" data-del="${e.id}" title="מחיקה">🗑</button>`:''}</td></tr>`}).join('')+'</tbody>';
+      <td class="noprint">${mine?`<button class="btn sm" data-ed="${e.id}" title="עריכה">✎</button> <button class="btn sm" data-del="${e.id}" title="מחיקה">🗑</button>`:''}</td></tr>`}).join('')+(rows.length?'':`<tr><td colspan="8" class="empty">אין דיווחים בין ${f?f.split('-').reverse().join('/'):'…'} ל-${t?t.split('-').reverse().join('/'):'…'} – בחר טווח רחב יותר למעלה (למשל "חודש אחרון")</td></tr>`)+'</tbody>';
   $('#hTotal').textContent = `סה"כ: ${tot.toFixed(2)} שעות · ${rows.length.toLocaleString('he-IL')} דיווחים`+(pp?` · פרויקט ${pp.iso_number||''}`:($('#hScope').value==='proj'?' · כל הפרויקטים (לא נבחר פרויקט)':''))+(rows.length>LIM?` (מוצגים ${LIM} אחרונים – צמצם תאריכים או עובד)`:'');
   $$('#hTable [data-del]').forEach(b=>b.onclick=async()=>{ await DB.delEntry(+b.dataset.del); renderHours(); toast('נמחק'); });
   $$('#hTable [data-ed]').forEach(b=>b.onclick=()=>{ const e=S.entries.find(x=>x.id==b.dataset.ed);
