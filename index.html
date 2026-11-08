@@ -55,6 +55,9 @@ main{padding:12px 16px 40px;max-width:1400px;margin:0 auto}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .g5{grid-template-columns:2fr 1fr 1fr 1fr 2fr}
 .g6{grid-template-columns:repeat(6,minmax(0,1fr))}
+.g6h{grid-template-columns:2fr 1fr .8fr .8fr .8fr 2fr}
+.g5r{grid-template-columns:2fr 1fr 1fr 1fr 1fr}
+#rTable tr.sec th{background:#fbeaea;color:var(--red-d);text-align:right;font-size:14px}
 label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);justify-content:flex-end}
 .fld input.t24{direction:ltr;text-align:right;font-variant-numeric:tabular-nums}
 .fld input.bad{border-color:var(--red);background:#fff5f5}
@@ -130,7 +133,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 .demo{background:#fff7e6;border:1px solid #f5c26b;border-radius:8px;padding:6px 10px;font-size:12px;margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 @media (max-width:700px){
   header img{height:34px} header .title{font-size:17px}
-  .grid,.g4,.g5,.g6{grid-template-columns:1fr 1fr} .grid .w2,.grid .w3,.grid .m-full{grid-column:1/-1}
+  .grid,.g4,.g5,.g6,.g6h,.g5r{grid-template-columns:1fr 1fr} .grid .w2,.grid .w3,.grid .m-full{grid-column:1/-1}
   main{padding:10px}
   .hide-m{display:none}
 }
@@ -256,10 +259,10 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
   <section id="tab-hours" class="hide">
     <div class="card">
       <h3>1. דיווח שעות<span class="running hide" id="hRunning"></span></h3>
-      <div class="grid g5">
-        <div class="f m-full"><span style="font-size:12px;color:var(--muted)">פרויקט (נבחר בלשונית "פרויקטים")</span>
-          <div class="projshow none" id="hProject" title="לבחירת פרויקט אחר עבור ללשונית פרויקטים">לא נבחר פרויקט</div>
-        </div>
+      <div class="grid g6h">
+        <label class="f m-full">פרויקט – הקלד מספר עבודה או שם ובחר מהרשימה
+          <div class="fld"><input id="hProjPick" list="projList" placeholder="חיפוש פרויקט…" autocomplete="off"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        </label>
         <label class="f">תאריך
           <div class="fld"><input id="hDate" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div>
         </label>
@@ -268,6 +271,9 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
         </label>
         <label class="f">שעת סיום · 24 שעות
           <div class="fld"><input id="hEnd" class="t24" placeholder="00:00" inputmode="numeric" maxlength="5"><button class="x" tabindex="-1" title="נקה">✕</button></div>
+        </label>
+        <label class="f">או סה"כ שעות
+          <div class="fld"><input id="hDur" placeholder="1.5 או 1:30" inputmode="decimal" title="אפשר לרשום רק כמה זמן עבדת בסך הכל, בלי שעת התחלה וסיום"><button class="x" tabindex="-1" title="נקה">✕</button></div>
         </label>
         <label class="f">הערה
           <div class="fld"><input id="hNotes" placeholder="מה עשית (לא חובה)"><button class="x" tabindex="-1" title="נקה">✕</button></div>
@@ -296,6 +302,8 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
       <div class="bar" style="margin-bottom:8px">
         <h3 style="margin:0">2. הדיווחים שלי</h3>
         <div class="sp"></div>
+        <label class="f">פרויקט
+          <div class="fld"><select id="hScope" title="להציג רק את הדיווחים של הפרויקט שנבחר, או את כל הפרויקטים"><option value="proj">הפרויקט הנבחר</option><option value="all">כל הפרויקטים</option></select></div></label>
         <label class="f" id="hWhoWrap">עובד
           <div class="fld"><select id="hWho"></select></div></label>
         <label class="f">מתאריך<div class="fld"><input id="hFrom" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
@@ -352,6 +360,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
       <div class="bar" style="margin-top:12px">
         <button class="btn pri" id="pSave" title="שמירת כרטיס הפרויקט">שמור</button>
         <button class="btn hide" id="pArchive" title="העברת הפרויקט לארכיון – רק לפרויקט בסטטוס גמר, הנהלה או כספים">העברה לארכיון</button>
+        <button class="btn" id="pHours" title="כל השעות שדווחו על הפרויקט, מכל העובדים">שעות בפרויקט</button>
         <button class="btn" data-reset="project" title="ניקוי כל שדות הכרטיס">איפוס טופס</button>
         <div class="sp"></div>
         <button class="btn" data-exp="xlsx" data-t="pCard">Excel</button>
@@ -397,14 +406,25 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
   <section id="tab-reports" class="hide">
     <div class="card">
       <h3>דוחות שעות</h3>
-      <div class="grid g4">
-        <label class="f w2">סוג דוח<div class="fld"><select id="rType">
+      <div class="grid g5r">
+        <label class="f">סוג דוח<div class="fld"><select id="rType">
+          <option value="daily" class="mgmtOnly">דוח יומי – סנכרון, פרויקטים חדשים ומי הזין שעות</option>
+          <option value="recent">מה עשו העובדים – לפי יום</option>
+          <option value="detail">פירוט מלא – כל הדיווחים (עובד, פרויקט, שעות, הערה)</option>
+          <option value="empDayP">שעות לפי עובד ויום</option>
+          <option value="empWeek">שעות לפי עובד ושבוע</option>
+          <option value="empMonth">שעות לפי עובד וחודש</option>
+          <option value="empProj">שעות לפי עובד ופרויקט</option>
           <option value="projEmp">שעות בפרויקט הנבחר – לפי עובד</option>
           <option value="projMonth">שעות בפרויקט הנבחר – לפי חודש</option>
           <option value="projList">שעות בפרויקט הנבחר – כל הדיווחים</option>
           <option value="empSum">שעות לפי עובד (כל הפרויקטים)</option>
           <option value="projSum">שעות לפי פרויקט (כל העובדים)</option>
         </select></div></label>
+        <label class="f">טווח<div class="fld"><select id="rRange">
+          <option value="">לפי התאריכים</option><option value="today">היום</option><option value="yest">אתמול</option><option value="d7">7 ימים אחרונים</option>
+          <option value="week">השבוע</option><option value="month">החודש</option><option value="pmonth">החודש הקודם</option><option value="year">השנה</option></select></div></label>
+        <label class="f">עובד<div class="fld"><select id="rWho"></select></div></label>
         <label class="f">מתאריך<div class="fld"><input id="rFrom" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
         <label class="f">עד תאריך<div class="fld"><input id="rTo" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
       </div>
@@ -463,8 +483,8 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.25';
-const VERSION_DATE = '07.11.2026';
+const VERSION = '0.26';
+const VERSION_DATE = '08.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
 const SUPABASE_URL = 'https://wiwdszhdjnzyrbxxakbm.supabase.co';
@@ -642,7 +662,7 @@ function showTab(t){
   if(t==='card') showCard();
   if(t==='money') showMoney();
   if(t==='reports'){ showBusy('מכין את הדוח…'); setTimeout(()=>{ try{ renderReport(); } finally{ hideBusy(); } },30); }
-  if(t==='hours'){ checkTimerProject(); syncHoursProject(); }
+  if(t==='hours'){ checkTimerProject(); syncHoursProject(); renderHours(); }
   window.scrollTo({top:0});
 }
 $$('nav.tabs button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
@@ -717,7 +737,7 @@ function tick(){
 setInterval(tick,1000);
 $('#hTimer').onclick = ()=>{
   if(!timer){
-    const p = curProj; if(!p) return toast('לא נבחר פרויקט – בחר פרויקט בלשונית "פרויקטים"');
+    const p = curProj; if(!p) return toast('לא נבחר פרויקט – בחר פרויקט בשדה "פרויקט"');
     const now=new Date(); const pl=plannedFromFields(now);
     if(pl==='past') return toast('שעת הסיום שבחרת כבר עברה');
     timer={project_id:p.id,first:now,acc:0,seg:now,last:null,planned:pl}; saveTimer();
@@ -727,13 +747,19 @@ $('#hTimer').onclick = ()=>{
 };
 $('#hAdd').onclick = async ()=>{
   if(timer){ if(timer.seg) return toast('יש לעצור קודם את השעון ("סיים עבודה")'); return saveTimerEntry(false); }
-  const p = curProj; if(!p) return toast('לא נבחר פרויקט – בחר פרויקט בלשונית "פרויקטים"');
-  const s=norm24($('#hStart').value), e=norm24($('#hEnd').value), d=$('#hDate').value;
-  if(!d||!s||!e) return toast('יש למלא תאריך, שעת התחלה ושעת סיום בפורמט 24 שעות');
-  await DB.saveEntry({staff_id:me.staff_id,project_id:p.id,work_date:d,start_time:s,end_time:e,hours:hrs(s,e),notes:$('#hNotes').value||null});
-  $('#hStart').value=''; $('#hEnd').value=''; $('#hNotes').value='';
+  const p = curProj; if(!p) return toast('לא נבחר פרויקט – בחר פרויקט בשדה "פרויקט"');
+  const s=norm24($('#hStart').value), e=norm24($('#hEnd').value), d=$('#hDate').value, du=parseDur($('#hDur').value);
+  if(!d) return toast('יש לבחור תאריך');
+  if(!(s&&e) && !du) return toast('יש למלא שעת התחלה ושעת סיום, או רק סה"כ שעות (למשל 1.5 או 1:30)');
+  await DB.saveEntry({staff_id:me.staff_id,project_id:p.id,work_date:d,start_time:(s&&e)?s:null,end_time:(s&&e)?e:null,hours:(s&&e)?hrs(s,e):du,notes:$('#hNotes').value||null});
+  $('#hStart').value=''; $('#hEnd').value=''; $('#hDur').value=''; $('#hNotes').value='';
   renderHours(); toast('הדיווח נשמר');
 };
+/* "1.5" / "1,5" / "1:30" → 1.5 hours */
+function parseDur(v){ v=String(v||'').trim().replace(',','.'); if(!v) return 0; let h; if(v.includes(':')){ const [a,b]=v.split(':'); h=(+a||0)+(+b||0)/60; } else h=+v; return (h>0&&h<=24)?Math.round(h*100)/100:0; }
+$('#hProjPick').addEventListener('change',()=>{ const v=$('#hProjPick').value.trim(); if(!v) return; const p=projByLabel(v)||S.projects.find(x=>String(x.iso_number||'').trim()===v); if(!p){ toast('לא נמצא פרויקט – בחר מהרשימה'); return; } selectProject(p); checkTimerProject(); renderHours(); });
+$('#hProjPick').addEventListener('input',()=>{ const v=$('#hProjPick').value; if(!v){ if(!timer && curProj){ selectProject(null); renderHours(); } return; } const p=IX.lbl.get(v); if(p && p!==curProj){ selectProject(p); checkTimerProject(); renderHours(); } });
+$('#pHours').onclick=()=>{ if(!curProj) return toast('לא נבחר פרויקט'); $('#rType').value='projList'; $('#rRange').value=''; $('#rFrom').value='2000-01-01'; $('#rTo').value=today(); showTab('reports'); };
 /* switching project while a timer exists – checked when entering the hours tab */
 function checkTimerProject(){
   if(!timer || !curProj || curProj.id===timer.project_id) return;
@@ -749,11 +775,12 @@ function askModal(html,btns){
   $('#modalBtns').innerHTML=''; btns.forEach(b=>{ const x=document.createElement('button'); x.className='btn '+(b.c||''); x.textContent=b.t; x.onclick=async()=>{ m.classList.add('hide'); await b.f(); }; $('#modalBtns').appendChild(x); });
   m.classList.remove('hide');
 }
-['#hWho','#hFrom','#hTo'].forEach(s=>$(s).addEventListener('change',renderHours));
+['#hWho','#hFrom','#hTo','#hScope'].forEach(s=>$(s).addEventListener('change',renderHours));
 function renderHours(){
   const who=$('#hWho').value, f=$('#hFrom').value, t=$('#hTo').value;
   const vis = new Set(visibleStaff().map(s=>s.id));
-  const rows = S.entries.filter(e=>vis.has(e.staff_id) && (!who||e.staff_id==who) && (!f||e.work_date>=f) && (!t||e.work_date<=t))
+  const pp = $('#hScope').value==='proj' ? (timer?projById(timer.project_id):curProj) : null, pid = pp?.id ?? null;
+  const rows = S.entries.filter(e=>vis.has(e.staff_id) && (!pid||e.project_id===pid) && (!who||e.staff_id==who) && (!f||e.work_date>=f) && (!t||e.work_date<=t))
     .sort((a,b)=>(b.work_date+b.start_time).localeCompare(a.work_date+a.start_time));
   const multi = !who && visibleStaff().length>1;
   let tot=0; rows.forEach(e=>tot+= +(e.hours??hrs(e.start_time,e.end_time)??0));
@@ -763,17 +790,18 @@ function renderHours(){
       const mine = REAL===false && (e.staff_id===me.staff_id || isMgmt());
       return `<tr><td>${e.work_date.split('-').reverse().join('.')}</td>${multi?`<td>${esc(staffName(e.staff_id))}</td>`:''}<td>${esc(projLabel(p))}</td><td>${e.start_time?.slice(0,5)||''}</td><td>${e.end_time?.slice(0,5)||''}</td><td class="num">${(+h).toFixed(2)}</td><td class="hide-m">${esc(e.notes)}</td>
       <td class="noprint">${mine?`<button class="btn sm" data-ed="${e.id}" title="עריכה">✎</button> <button class="btn sm" data-del="${e.id}" title="מחיקה">🗑</button>`:''}</td></tr>`}).join('')+'</tbody>';
-  $('#hTotal').textContent = `סה"כ: ${tot.toFixed(2)} שעות · ${rows.length.toLocaleString('he-IL')} דיווחים`+(rows.length>LIM?` (מוצגים ${LIM} אחרונים – צמצם תאריכים או עובד)`:'');
+  $('#hTotal').textContent = `סה"כ: ${tot.toFixed(2)} שעות · ${rows.length.toLocaleString('he-IL')} דיווחים`+(pp?` · פרויקט ${pp.iso_number||''}`:($('#hScope').value==='proj'?' · כל הפרויקטים (לא נבחר פרויקט)':''))+(rows.length>LIM?` (מוצגים ${LIM} אחרונים – צמצם תאריכים או עובד)`:'');
   $$('#hTable [data-del]').forEach(b=>b.onclick=async()=>{ await DB.delEntry(+b.dataset.del); renderHours(); toast('נמחק'); });
   $$('#hTable [data-ed]').forEach(b=>b.onclick=()=>{ const e=S.entries.find(x=>x.id==b.dataset.ed);
-    selectProject(projById(e.project_id)); $('#hDate').value=e.work_date; $('#hStart').value=e.start_time?.slice(0,5)||''; $('#hEnd').value=e.end_time?.slice(0,5)||''; $('#hNotes').value=e.notes||'';
+    selectProject(projById(e.project_id)); $('#hDate').value=e.work_date; $('#hStart').value=e.start_time?.slice(0,5)||''; $('#hEnd').value=e.end_time?.slice(0,5)||''; $('#hDur').value=e.start_time?'':(e.hours??''); $('#hNotes').value=e.notes||'';
     $('#hAdd').textContent='עדכן דיווח'; $('#hAdd').onclick=async()=>{ const p=curProj; if(!p) return toast('לא נבחר פרויקט');
-      await DB.saveEntry({id:e.id,staff_id:e.staff_id,project_id:p.id,work_date:$('#hDate').value,start_time:$('#hStart').value,end_time:$('#hEnd').value,hours:hrs($('#hStart').value,$('#hEnd').value),notes:$('#hNotes').value||null});
+      const s2=norm24($('#hStart').value), e2=norm24($('#hEnd').value), du2=parseDur($('#hDur').value); if(!(s2&&e2) && !du2) return toast('יש למלא שעת התחלה וסיום, או סה"כ שעות');
+      await DB.saveEntry({id:e.id,staff_id:e.staff_id,project_id:p.id,work_date:$('#hDate').value,start_time:(s2&&e2)?s2:null,end_time:(s2&&e2)?e2:null,hours:(s2&&e2)?hrs(s2,e2):du2,notes:$('#hNotes').value||null});
       location.hash=''; resetHours(); renderHours(); toast('עודכן'); };
     window.scrollTo({top:0,behavior:'smooth'}); });
 }
 const addHandler = $('#hAdd').onclick;
-function resetHours(){ ['#hStart','#hEnd','#hNotes'].forEach(s=>$(s).value=''); $('#hDate').value=today(); $('#hAdd').textContent='שמור דיווח'; $('#hAdd').onclick=addHandler; }
+function resetHours(){ ['#hStart','#hEnd','#hDur','#hNotes'].forEach(s=>$(s).value=''); $('#hScope').value='proj'; $('#hDate').value=today(); $('#hAdd').textContent='שמור דיווח'; $('#hAdd').onclick=addHandler; }
 
 /* ================= PROJECTS ================= */
 let curProj = null;
@@ -833,11 +861,11 @@ $('#selBoq').onclick=()=>{ const p=curProj; if(!p||!p.iso_number) return;
   window.open(BOQ_URL+'?iso='+encodeURIComponent(String(p.iso_number).trim())+'&name='+encodeURIComponent(p.name||'')+'&client='+encodeURIComponent(clientName(p.client_id)||''),'tiktin-boq'); };
 $('#selClear').onclick=()=>{ selectProject(null); const t=$('nav.tabs button.on')?.dataset.tab; if(t) showTab(t); };
 function syncHoursProject(){
-  const el=$('#hProject'); if(!el) return;
+  const el=$('#hProjPick'); if(!el) return;
   const p = timer ? projById(timer.project_id) : curProj;
-  el.textContent = p ? projLabel(p) : 'לא נבחר פרויקט – בחר בלשונית "פרויקטים"';
-  el.classList.toggle('none',!p);
-  el.title = timer ? 'בזמן מדידה לא ניתן להחליף פרויקט – יש לעצור קודם את השעון' : 'לבחירת פרויקט אחר עבור ללשונית "פרויקטים"';
+  if(document.activeElement!==el) el.value = p ? projLabel(p) : '';
+  el.disabled = !!timer;
+  el.title = timer ? 'בזמן מדידה לא ניתן להחליף פרויקט – יש לעצור קודם את השעון' : 'הקלד מספר עבודה או שם הפרויקט ובחר מהרשימה';
 }
 function showCard(){
   const has = !!curProj || newMode;
@@ -924,11 +952,48 @@ $('#pArchive').onclick=async()=>{ if(!curProj || !canArchive()) return;
   const pr=projById(curProj.id); pr.archived=toArch; fillDatalists(); selectProject(pr); renderProjects(); showCard(); toast(toArch?'הפרויקט הועבר לארכיון':'הפרויקט הוחזר מהארכיון'); };
 
 /* ================= REPORTS ================= */
-function initReports(){ const d=new Date(); $('#rFrom').value=localISO(new Date(d.getFullYear(),0,1)); $('#rTo').value=today(); }
+function initReports(){ const d=new Date(); $('#rFrom').value=localISO(new Date(d.getFullYear(),0,1)); $('#rTo').value=today(); $('#rType').value='recent'; $('#rRange').value='d7'; setRange('d7');
+  $$('#rType option.mgmtOnly').forEach(o=>{ o.hidden=!isMgmt(); o.disabled=!isMgmt(); }); if($('#rType').selectedOptions[0]?.disabled) $('#rType').value='recent';
+  const vs=visibleStaff(); $('#rWho').innerHTML=(vs.length>1?'<option value="">כל העובדים</option>':'')+vs.map(s=>`<option value="${s.id}">${esc(s.full_name)}</option>`).join(''); }
+function setRange(r){ const d=new Date(), D=(y,m,dd)=>localISO(new Date(y,m,dd)); let f=null,t=today();
+  if(r==='today') f=t; if(r==='yest'){ f=t=D(d.getFullYear(),d.getMonth(),d.getDate()-1); } if(r==='d7') f=D(d.getFullYear(),d.getMonth(),d.getDate()-6);
+  if(r==='week') f=D(d.getFullYear(),d.getMonth(),d.getDate()-d.getDay()); if(r==='month') f=D(d.getFullYear(),d.getMonth(),1);
+  if(r==='pmonth'){ f=D(d.getFullYear(),d.getMonth()-1,1); t=D(d.getFullYear(),d.getMonth(),0); } if(r==='year') f=D(d.getFullYear(),0,1);
+  if(f){ $('#rFrom').value=f; $('#rTo').value=t; } }
+$('#rRange').addEventListener('change',()=>{ setRange($('#rRange').value); renderReport(); });
+['#rFrom','#rTo'].forEach(s=>$(s).addEventListener('input',()=>{ $('#rRange').value=''; }));
+$('#rType').addEventListener('change',()=>{ const t=$('#rType').value; if(t==='daily'){ $('#rRange').value=new Date().getDay()===0?'':'yest'; if(new Date().getDay()===0){ const d=new Date(); $('#rFrom').value=localISO(new Date(d.getFullYear(),d.getMonth(),d.getDate()-3)); $('#rTo').value=localISO(new Date(d.getFullYear(),d.getMonth(),d.getDate()-1)); } else setRange('yest'); }
+  if(t==='recent' && $('#rRange').value==='year'){ $('#rRange').value='d7'; setRange('d7'); } });
+$('#rWho').addEventListener('change',()=>renderReport());
+let dailySeq=0;
+async function renderDaily(){
+  const T=$('#rTable'), seq=++dailySeq;
+  if(!GATE?.tok){ T.innerHTML='<tbody><tr><td class="empty">הדוח היומי זמין רק בכניסה עם סיסמה אישית</td></tr></tbody>'; $('#rTotal').textContent=''; return; }
+  const f=$('#rFrom').value||today(); const days=Math.min(31,Math.max(1,Math.round((new Date(today())-new Date(f))/864e5)));
+  T.innerHTML='<tbody><tr><td class="empty">טוען את הדוח מהשרת…</td></tr></tbody>';
+  let r; try{ r=await rpc('demo_daily_report_t',{p_token:GATE.tok,p_days:days}); }catch(e){ if(seq===dailySeq) T.innerHTML='<tbody><tr><td class="empty">אין חיבור לשרת</td></tr></tbody>'; return; }
+  if(seq!==dailySeq) return;
+  if(!r||r.error){ T.innerHTML=`<tbody><tr><td class="empty">${r?.error==='expired'?'פג תוקף הכניסה – צא והיכנס שוב':'אין הרשאה לדוח היומי'}</td></tr></tbody>`; return; }
+  const sec=(t,h)=>`<tr class="sec"><th colspan="4">${esc(t)}</th></tr>`+(h?`<tr>${h.map((x,i)=>`<th class="${i&&/שעות|רישומים|רשומות/.test(x)?'num':''}">${esc(x)}</th>`).join('')}</tr>`:'');
+  const row=c=>'<tr>'+[0,1,2,3].map(i=>`<td class="${typeof c[i]==='number'?'num':''}">${esc(c[i]??'')}</td>`).join('')+'</tr>';
+  const none='<tr><td colspan="4" class="muted">אין</td></tr>';
+  const L=a=>a||[]; const hv=L(r.hv_by_user).slice().sort((a,b)=>b.hours-a.hours); const th=hv.reduce((s,x)=>s+(+x.hours||0),0);
+  let h='<tbody>';
+  h+=sec('סנכרון לילי (חצות)',['שעה','מקור','מצב','רשומות'])+(L(r.sync).map(x=>row([x.at,/^harvest/.test(x.note)?'הרבסט':'מאסטר פלאן',x.ok?'בוצע ✓':'נכשל ✗',+x.rows||0])).join('')||'<tr><td colspan="4"><b>הסנכרון לא רץ בתקופה הזו</b></td></tr>');
+  h+=sec(`פרויקטים חדשים במאסטר פלאן (${L(r.mp_new).length}) · עודכנו ${r.mp_updated_count||0} · נסגרו ${L(r.mp_closed).length}`,['מספר','שם','לקוח','מהנדס'])+(L(r.mp_new).map(x=>row([x.iso,x.name,x.client,x.engineer])).join('')||none);
+  if(L(r.mp_closed).length) h+=sec('פרויקטים שנסגרו במאסטר פלאן',['מספר','שם','',''])+L(r.mp_closed).map(x=>row([x.iso,x.name])).join('');
+  h+=sec(`פרויקטים חדשים בהרבסט (${L(r.hv_new_projects).length})`,['קוד','שם','לקוח',''])+(L(r.hv_new_projects).map(x=>row([x.code,x.name,x.client])).join('')||none);
+  h+=sec(`שעות בהרבסט – ${hv.length} עובדים · ${th.toFixed(2)} שעות`,['עובד','רישומים','שעות','פרויקטים'])+(hv.map(x=>row([x.user,+x.entries,+(+x.hours).toFixed(2),x.projects])).join('')||none);
+  if(L(r.hv_late).length) h+=sec('הזינו באיחור (לתאריכים קודמים)',['עובד','רישומים','שעות','לתאריכים'])+L(r.hv_late).map(x=>row([x.user,+x.entries,+(+x.hours).toFixed(2),x.dates])).join('');
+  h+=sec(`לא הזינו שעות בתקופה (${L(r.hv_missing).length})`,null)+(L(r.hv_missing).length?`<tr><td colspan="4">${esc(L(r.hv_missing).join(', '))}</td></tr>`:none);
+  T.innerHTML=h+'</tbody>';
+  $('#rTotal').textContent=`דוח יומי ${r.from}${r.to!==r.from?' – '+r.to:''} · ${th.toFixed(2)} שעות · ${L(r.mp_new).length+L(r.hv_new_projects).length} פרויקטים חדשים`;
+}
 ['#rType','#rFrom','#rTo'].forEach(x=>$(x).addEventListener('change',renderReport));
 function renderReport(){
-  const type=$('#rType').value, f=$('#rFrom').value, t=$('#rTo').value;
-  const vis=new Set(visibleStaff().map(s=>s.id));
+  const type=$('#rType').value, f=$('#rFrom').value, t=$('#rTo').value, who=$('#rWho').value;
+  if(type==='daily') return renderDaily();
+  const vis=new Set(visibleStaff().filter(s=>!who||s.id==who).map(s=>s.id));
   const needP = type.startsWith('proj') && type!=='projSum';
   if(needP && !curProj){ $('#rTable').innerHTML='<tbody><tr><td class="empty">לא נבחר פרויקט – בחר פרויקט בלשונית "פרויקטים", או בחר דוח של כל הפרויקטים.</td></tr></tbody>'; $('#rTotal').textContent=''; return; }
   const E=S.entries.filter(e=>vis.has(e.staff_id) && (!f||e.work_date>=f) && (!t||e.work_date<=t) && (!needP||e.project_id===curProj.id));
@@ -940,24 +1005,48 @@ function renderReport(){
   if(type==='projList'){ head=['תאריך','עובד','שעות','הערה']; rows=E.slice().sort((a,b)=>b.work_date.localeCompare(a.work_date)).slice(0,1500).map(e=>[e.work_date.split('-').reverse().join('.'),staffName(e.staff_id),H(e).toFixed(2),e.notes||'']); }
   if(type==='empSum'){ head=['עובד','דיווחים','שעות']; rows=group(e=>e.staff_id).map(([k,o])=>[staffName(k),o.n,o.h.toFixed(2)]); }
   if(type==='projSum'){ head=['פרויקט','דיווחים','שעות']; rows=group(e=>e.project_id).slice(0,1500).map(([k,o])=>[projLabel(projById(k)),o.n,o.h.toFixed(2)]); }
-  const numCol=i=>head[i]==='שעות'||head[i]==='דיווחים';
+  const dd=d=>d.split('-').reverse().join('.');
+  let numFrom=99;
+  if(type==='recent'){ head=['תאריך','עובד','שעות','פרויקטים','מה עשה']; const m=new Map();
+    E.forEach(e=>{ const k=e.work_date+'|'+e.staff_id; const o=m.get(k)||{d:e.work_date,s:e.staff_id,h:0,p:new Set(),n:[]}; o.h+=H(e); const p=projById(e.project_id); o.p.add(p?.iso_number||p?.name||''); if(e.notes) o.n.push(e.notes); m.set(k,o); });
+    rows=[...m.values()].sort((a,b)=>b.d.localeCompare(a.d)||COLL.compare(staffName(a.s),staffName(b.s))).slice(0,3000).map(o=>[dd(o.d),staffName(o.s),o.h.toFixed(2),[...o.p].filter(Boolean).join(', '),[...new Set(o.n)].join(' · ')]); }
+  if(type==='detail'){ head=['תאריך','עובד','פרויקט','התחלה','סיום','שעות','הערה']; rows=E.slice().sort((a,b)=>b.work_date.localeCompare(a.work_date)||COLL.compare(staffName(a.staff_id),staffName(b.staff_id))).slice(0,3000).map(e=>[dd(e.work_date),staffName(e.staff_id),projLabel(projById(e.project_id)),e.start_time?.slice(0,5)||'',e.end_time?.slice(0,5)||'',H(e).toFixed(2),e.notes||'']); }
+  if(type==='empProj'){ head=['עובד','פרויקט','דיווחים','שעות']; const m=new Map(); E.forEach(e=>{ const k=e.staff_id+'|'+e.project_id; const o=m.get(k)||{s:e.staff_id,p:e.project_id,h:0,n:0}; o.h+=H(e); o.n++; m.set(k,o); });
+    rows=[...m.values()].sort((a,b)=>COLL.compare(staffName(a.s),staffName(b.s))||b.h-a.h).slice(0,3000).map(o=>[staffName(o.s),projLabel(projById(o.p)),o.n,o.h.toFixed(2)]); }
+  if(type==='empDayP'||type==='empWeek'||type==='empMonth'){
+    const wk=d=>{ const x=new Date(d+'T12:00'); x.setDate(x.getDate()-x.getDay()); return localISO(x); };
+    const kf= type==='empDayP' ? (e=>e.work_date) : type==='empWeek' ? (e=>wk(e.work_date)) : (e=>e.work_date.slice(0,7));
+    const lf= type==='empDayP' ? (k=>dd(k).slice(0,5)) : type==='empWeek' ? (k=>'שבוע '+dd(k).slice(0,5)) : (k=>k.split('-').reverse().join('/'));
+    const MAXC=type==='empDayP'?14:type==='empWeek'?12:12;
+    const cols=[...new Set(E.map(kf))].sort().slice(-MAXC); const cs=new Set(cols); const m=new Map();
+    E.forEach(e=>{ const k=kf(e); if(!cs.has(k)) return; const o=m.get(e.staff_id)||{}; o[k]=(o[k]||0)+H(e); o.t=(o.t||0)+H(e); m.set(e.staff_id,o); });
+    head=['עובד',...cols.map(lf),'סה"כ']; numFrom=1;
+    rows=[...m.entries()].sort((a,b)=>b[1].t-a[1].t).map(([s,o])=>[staffName(s),...cols.map(c=>o[c]?o[c].toFixed(2):''),o.t.toFixed(2)]);
+    tot=[...m.values()].reduce((a,o)=>a+o.t,0);
+    if(rows.length) rows.push(['סה"כ',...cols.map(c=>{ let x=0; m.forEach(o=>x+=o[c]||0); return x?x.toFixed(2):''; }),tot.toFixed(2)]); }
+  const numCol=i=>i>=numFrom||head[i]==='שעות'||head[i]==='דיווחים';
   $('#rTable').innerHTML='<thead><tr>'+head.map((h,i)=>`<th class="${numCol(i)?'num':''}">${h}</th>`).join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map((c,i)=>`<td class="${numCol(i)?'num':''}">${esc(c)}</td>`).join('')+'</tr>').join('')+'</tbody>';
-  $('#rTotal').textContent=`סה"כ: ${tot.toFixed(2)} שעות · ${E.length.toLocaleString('he-IL')} דיווחים`+(needP?` · ${projLabel(curProj)}`:'');
+  if(!rows.length) $('#rTable').innerHTML='<tbody><tr><td class="empty">אין דיווחים בטווח שנבחר</td></tr></tbody>';
+  $('#rTotal').textContent=`סה"כ: ${tot.toFixed(2)} שעות · ${E.length.toLocaleString('he-IL')} דיווחים`+(who?` · ${staffName(+who)}`:'')+(needP?` · ${projLabel(curProj)}`:'');
 }
 
 /* ================= CLIENTS / CONTACTS ================= */
 let curContact=null;
 $('#cSearch').addEventListener('input',renderClients);
+/* חברת החשמל: ח"ח / חח"י / חברת החשמל / IEC – כולם נמצאים בחיפוש */
+const PB_NORM = s => String(s||'').toLowerCase().replace(/["'״׳`]/g,'').replace(/חברת ה?חשמל|חחי|iec/g,'חח');
+const pbClient = cn => /^ח["'״׳]?ח["'״׳]?י?(?=\s|-|$)/.test(cn||'') ? String(cn).replace(/^ח["'״׳]?ח["'״׳]?י?/,'חברת החשמל') : (cn||'');
 function renderClients(){
-  const q=$('#cSearch').value.trim().toLowerCase();
+  const q=PB_NORM($('#cSearch').value.trim());
   const rows=[]; const LIM=300;
-  for(const k of S.contacts){ const cn=clientName(k.client_id); if(!q||(k._s||(k._s=[k.full_name,cn,k.mobile,k.phone,k.email,k.title].join(' ').toLowerCase())).includes(q)) rows.push({k,cn}); }
+  for(const k of S.contacts){ const cn=clientName(k.client_id); if(!q||(k._s||(k._s=PB_NORM([k.full_name,cn,pbClient(cn),k.mobile,k.phone,k.email,k.title].join(' ')))).includes(q)) rows.push({k,cn:pbClient(cn)}); }
+  if(q) rows.sort((a,b)=>(/^חברת החשמל/.test(b.cn)?1:0)-(/^חברת החשמל/.test(a.cn)?1:0));
   const withC = IX.withC || (IX.withC=new Set(S.contacts.map(k=>k.client_id)));
-  const clientsNoContact = q ? S.clients.filter(c=>!withC.has(c.id) && c.name.toLowerCase().includes(q)) : [];
+  const clientsNoContact = q ? S.clients.filter(c=>!withC.has(c.id) && PB_NORM(c.name+' '+pbClient(c.name)).includes(q)) : [];
   const total=rows.length;
   $('#cTable').innerHTML = `<thead><tr><th>לקוח / חברה</th><th>איש קשר</th><th class="hide-m">תפקיד</th><th>נייד</th><th class="hide-m">טלפון</th><th>מייל</th></tr></thead><tbody>`+
     rows.slice(0,LIM).map(({k,cn})=>`<tr class="click" data-k="${k.id}"><td>${esc(cn)}</td><td>${esc(k.full_name)}</td><td class="hide-m">${esc(k.title)}</td><td><a href="tel:${esc(k.mobile)}">${esc(k.mobile)}</a></td><td class="hide-m">${esc(k.phone)}</td><td><a href="mailto:${esc(k.email)}">${esc(k.email)}</a></td></tr>`).join('')+
-    clientsNoContact.slice(0,300).map(c=>`<tr><td>${esc(c.name)}</td><td class="muted" colspan="5">אין אנשי קשר</td></tr>`).join('')+'</tbody>';
+    clientsNoContact.slice(0,300).map(c=>`<tr><td>${esc(pbClient(c.name))}</td><td class="muted" colspan="5">אין אנשי קשר</td></tr>`).join('')+'</tbody>';
   $('#cCount').textContent=`${S.clients.length.toLocaleString('he-IL')} לקוחות · ${S.contacts.length.toLocaleString('he-IL')} אנשי קשר`+(total>LIM?` · נמצאו ${total.toLocaleString('he-IL')}, מוצגים ${LIM} – צמצם בחיפוש`:(q?` · נמצאו ${total}`:''));
   $$('#cTable tr.click').forEach(tr=>tr.onclick=e=>{ if(e.target.tagName==='A') return; openContact(S.contacts.find(k=>k.id==tr.dataset.k)); });
 }
@@ -976,7 +1065,7 @@ $$('[data-reset]').forEach(b=>b.onclick=()=>{
   if(w==='hours'){ resetHours(); initHours(); }
   if(w==='project'){ showCard(); }
   if(w==='money'){ showMoney(); }
-  if(w==='reports'){ $('#rType').selectedIndex=0; initReports(); renderReport(); }
+  if(w==='reports'){ $('#rType').value='recent'; initReports(); $('#rRange').value='d7'; setRange('d7'); renderReport(); }
   if(w==='contact'){ openContact(curContact); }
   toast('הטופס אופס');
 });
@@ -1029,6 +1118,7 @@ function startApp(){
   $('#pNew').classList.toggle('hide',!isFin());
   fillDatalists(); initHours(); initProjects(); initReports(); renderClients(); wireInputs();
   selectProject(curProj); showTab('projects');
+  if(/^#daily/.test(location.hash) && isMgmt()){ $('#rType').value='daily'; $('#rType').dispatchEvent(new Event('change')); showTab('reports'); }
   /* מעבר מכתבי כמויות: ?iso=12345 – פותח את כרטיס הפרויקט */
   const isoQ=(new URLSearchParams(location.search).get('iso')||'').trim();
   if(isoQ){ const p=S.projects.find(x=>String(x.iso_number||'').trim()===isoQ); history.replaceState(null,'',location.pathname);
