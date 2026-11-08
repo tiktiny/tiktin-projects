@@ -72,6 +72,9 @@ label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mu
 .fld input.dnat{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;padding:0;border:0;left:34px;bottom:0}
 .fld .cal{position:absolute;left:28px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;font-size:14px;line-height:1;padding:2px;opacity:.75}
 .fld .cal:hover{opacity:1}
+table.srt thead th{cursor:pointer;user-select:none}
+table.srt thead th:hover{color:var(--red)}
+table.srt th .si{font-size:10px;color:var(--red);margin-right:3px}
 input:focus,select:focus,textarea:focus{outline:2px solid #f5b7b9;border-color:var(--red)}
 .checks{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;min-height:var(--h)}
 .checks label{display:flex;gap:5px;align-items:center;font-size:13px;color:var(--ink)}
@@ -506,7 +509,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.31';
+const VERSION = '0.32';
 const VERSION_DATE = '08.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
@@ -692,8 +695,25 @@ function enhanceDates(root=document){
     sync();
   });
 }
+/* מיון לפי כותרת: לחיצה על כותרת עמודה ממיינת (לחיצה נוספת הופכת). שורות סה"כ נשארות בסוף */
+const TSORT={}, TOBS={};
+function cellKey(td){ const s=(td?.textContent||'').trim(); let m=s.match(/^(\d{2})[.\/](\d{2})[.\/](\d{4})/); if(m) return {n:+(m[3]+m[2]+m[1])};
+  m=s.match(/^(\d{2})\/(\d{4})$/); if(m) return {n:+(m[2]+m[1])}; const x=s.replace(/[,%\s]|ש׳/g,''); if(x!==''&&!isNaN(+x)) return {n:+x}; return {s}; }
+const thTxt=th=>(th?.firstChild?.textContent||th?.textContent||'').trim();
+function sortTable(t){ let st=TSORT[t.id]; const tb=t.tBodies[0]; if(!tb||t.querySelector('tr.sec')) return;
+  if(st && thTxt(t.querySelectorAll('thead th')[st.c])!==st.h){ delete TSORT[t.id]; st=null; }
+  t.querySelectorAll('thead th').forEach((th,i)=>{ let si=th.querySelector('.si'); if(!si){ si=document.createElement('span'); si.className='si'; th.appendChild(si); } si.textContent= st&&st.c===i ? (st.d>0?'▲':'▼') : ''; if(!th.title) th.title='לחיצה למיון לפי עמודה זו'; });
+  if(!st) return;
+  const rows=[...tb.rows], isTot=r=>/^סה"כ/.test((r.cells[0]?.textContent||'').trim()), body=rows.filter(r=>!isTot(r)&&r.cells.length>1), tail=rows.filter(r=>!body.includes(r));
+  body.sort((a,b)=>{ const A=cellKey(a.cells[st.c]),B=cellKey(b.cells[st.c]); let r; if(A.n!=null&&B.n!=null) r=A.n-B.n; else if(A.n!=null) r=-1; else if(B.n!=null) r=1; else r=COLL.compare(A.s||'',B.s||''); return r*st.d; });
+  const o=TOBS[t.id]; o&&o.disconnect(); body.concat(tail).forEach(r=>tb.appendChild(r)); o&&o.observe(t,{childList:true}); }
+function wireSort(){ ['hTable','hSum','rTable','cTable','bTable','mTable'].forEach(id=>{ const t=document.getElementById(id); if(!t||t._srt) return; t._srt=1; t.classList.add('srt');
+  t.addEventListener('click',e=>{ const th=e.target.closest('thead th'); if(!th||!t.contains(th)||t.querySelector('tr.sec')) return; const c=th.cellIndex, st=TSORT[id];
+    TSORT[id] = st&&st.c===c ? {c,d:-st.d,h:st.h} : {c,h:thTxt(th),d:/תאריך|שעות|דיווחים|ניצולת|הפרש|רישומים/.test(th.textContent)?-1:1}; FLUSH[id]?.(); sortTable(t); });
+  const o=new MutationObserver(()=>sortTable(t)); TOBS[id]=o; o.observe(t,{childList:true}); sortTable(t); }); }
 /* inputs: X clear buttons + first keystroke overwrites */
 function wireInputs(root=document){
+  wireSort();
   enhanceDates(root);
   root.querySelectorAll('input.t24').forEach(i=>{ if(i._t) return; i._t=1; });
   root.querySelectorAll('.fld .x').forEach(b=>{ if(b._w) return; b._w=1;
