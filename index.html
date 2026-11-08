@@ -78,6 +78,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid #f5b7b9;border-color:v
 .btn.go{background:var(--ok);color:#fff;border-color:var(--ok);min-width:118px}
 .btn.stop{background:var(--orange);color:#fff;border-color:var(--orange);min-width:118px}
 .btn.sm{height:28px;padding:0 9px;font-size:12px}
+#hQuick{gap:6px;flex-wrap:wrap;margin:0 0 8px}
+#hQuick .btn.on{background:var(--red);color:#fff;border-color:var(--red)}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .bar .sp{flex:1}
 .timer{font-size:22px;font-variant-numeric:tabular-nums;font-weight:700;min-width:88px;text-align:center;color:var(--orange);font-size:20px}
@@ -312,6 +314,16 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
         <label class="f">מתאריך<div class="fld"><input id="hFrom" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
         <label class="f">עד תאריך<div class="fld"><input id="hTo" type="date"><button class="x" tabindex="-1" title="נקה">✕</button></div></label>
       </div>
+      <div class="bar" id="hQuick">
+        <span class="muted" style="font-size:12px">טווח מהיר:</span>
+        <button class="btn sm" data-q="today" title="רק היום">היום</button>
+        <button class="btn sm" data-q="w" title="7 הימים האחרונים">שבוע אחרון</button>
+        <button class="btn sm" data-q="m" title="חודש אחורה מהיום">חודש אחרון</button>
+        <button class="btn sm" data-q="ms" title="מה-1 בחודש הנוכחי">מתחילת החודש</button>
+        <button class="btn sm" data-q="y" title="שנה אחורה מהיום">שנה אחרונה</button>
+        <button class="btn sm" data-q="ys" title="מה-1 בינואר השנה">מתחילת השנה</button>
+        <button class="btn sm" data-q="proj" title="מהדיווח הראשון בפרויקט שנבחר">מתחילת הפרויקט</button>
+      </div>
       <div class="tblwrap"><table id="hTable"></table></div>
       <div id="hSumWrap" class="hide" style="margin-top:10px"><h3 style="margin:0 0 6px">סה"כ שעות לכל עובד בפרויקט</h3>
         <div class="tblwrap" style="max-height:260px"><table id="hSum"></table></div></div>
@@ -490,7 +502,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.29';
+const VERSION = '0.30';
 const VERSION_DATE = '08.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
@@ -697,7 +709,7 @@ function loadTimer(){ try{ const t=JSON.parse(localStorage.getItem('tk_timer')||
 function initHours(){
   $('#hDate').value = today();
   const d = new Date(); const day=d.getDay(); const sun = new Date(d); sun.setDate(d.getDate()-day);
-  $('#hFrom').value = localISO(sun); $('#hTo').value = today();
+  $('#hFrom').value = localISO(sun); $('#hTo').value = today(); hQ='';
   $('#hWho').innerHTML=''; fillHoursWho();
   loadTimer(); if(timer?.planned) $('#hAutoAt').value=hhmm(timer.planned);
   renderTimer(); renderHours(); tick();
@@ -801,7 +813,16 @@ function askModal(html,btns){
   m.classList.remove('hide');
 }
 ['#hWho','#hFrom','#hTo','#hScope'].forEach(s=>$(s).addEventListener('change',renderHours));
+let hQ='';
+function hQuickRange(q){ const d=new Date(), y=d.getFullYear(), m=d.getMonth(), dd=d.getDate(), D=(a,b,c)=>localISO(new Date(a,b,c)); let f=null;
+  if(q==='today') f=today(); if(q==='w') f=D(y,m,dd-6); if(q==='m') f=D(y,m-1,dd); if(q==='ms') f=D(y,m,1); if(q==='y') f=D(y-1,m,dd); if(q==='ys') f=D(y,0,1);
+  if(q==='proj'){ const p=timer?projById(timer.project_id):curProj; if(!p) return null; let mn=null; for(const e of S.entries) if(e.project_id===p.id && (!mn||e.work_date<mn)) mn=e.work_date; f=mn||today(); }
+  return f; }
+$$('#hQuick [data-q]').forEach(b=>b.onclick=()=>{ const q=b.dataset.q; if(q==='proj' && !(timer||curProj)) return toast('לא נבחר פרויקט'); hQ=q; renderHours(); });
+['#hFrom','#hTo'].forEach(s=>$(s).addEventListener('input',()=>{ hQ=''; $$('#hQuick .btn').forEach(x=>x.classList.remove('on')); }));
 function renderHours(){
+  if(hQ){ const f=hQuickRange(hQ); if(f){ $('#hFrom').value=f; $('#hTo').value=today(); } }
+  $$('#hQuick [data-q]').forEach(x=>x.classList.toggle('on',x.dataset.q===hQ));
   const who=$('#hWho').value, f=$('#hFrom').value, t=$('#hTo').value;
   if(me.role==='team_lead' && !curProj && hAllEmp){ hAllEmp=false; } fillHoursWho();
   const vis = new Set(hoursStaff().map(s=>s.id));
