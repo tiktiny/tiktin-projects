@@ -420,6 +420,8 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
           <option value="empWeek">שעות לפי עובד ושבוע</option>
           <option value="empMonth">שעות לפי עובד וחודש</option>
           <option value="empProj">שעות לפי עובד ופרויקט</option>
+          <option value="util">ניצולת – שעות שדווחו מול היקף המשרה</option>
+          <option value="utilWeek">ניצולת לפי שבוע – אחוז מהיקף המשרה</option>
           <option value="projEmp">שעות בפרויקט הנבחר – לפי עובד</option>
           <option value="projMonth">שעות בפרויקט הנבחר – לפי חודש</option>
           <option value="projList">שעות בפרויקט הנבחר – כל הדיווחים</option>
@@ -488,7 +490,7 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.27';
+const VERSION = '0.28';
 const VERSION_DATE = '08.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
@@ -1053,6 +1055,32 @@ function renderReport(){
     rows=[...m.entries()].sort((a,b)=>b[1].t-a[1].t).map(([s,o])=>[staffName(s),...cols.map(c=>o[c]?o[c].toFixed(2):''),o.t.toFixed(2)]);
     tot=[...m.values()].reduce((a,o)=>a+o.t,0);
     if(rows.length) rows.push(['סה"כ',...cols.map(c=>{ let x=0; m.forEach(o=>x+=o[c]||0); return x?x.toFixed(2):''; }),tot.toFixed(2)]); }
+  if(type==='util'||type==='utilWeek'){
+    const CAP=new Map((GATE?.hu||[]).filter(u=>+u[1]>0).map(u=>[u[0],+u[1]]));
+    const t2 = (t && t<today()) ? t : today();
+    const wdays=(a,b)=>{ let n=0; if(!a||!b||a>b) return 0; const x=new Date(a+'T12:00'), e=new Date(b+'T12:00'); while(x<=e){ if(x.getDay()<=4) n++; x.setDate(x.getDate()+1); } return n; };
+    if(!CAP.size){ head=['הודעה']; rows=[['נתוני היקף המשרה מגיעים מהרבסט בסנכרון הלילי – צא והיכנס שוב כדי לטעון אותם']]; }
+    else if(type==='util'){
+      const wd=wdays(f||t2,t2); const byS=new Map(); E.forEach(e=>byS.set(e.staff_id,(byS.get(e.staff_id)||0)+H(e)));
+      const people=visibleStaff().filter(s=>(!who||s.id==who) && (CAP.has(s.full_name) || byS.has(s.id)));
+      head=['עובד','היקף משרה (שעות בשבוע)','ימי עבודה','שעות צפויות','שעות שדווחו','ניצולת','הפרש']; numFrom=1;
+      let te=0, tl=0;
+      rows=people.map(s=>{ const c=CAP.get(s.full_name)||0, exp=c/5*wd, got=byS.get(s.id)||0; te+=exp; tl+=got;
+        return {s, r:[s.full_name, c?c.toFixed(1):'—', wd, exp?exp.toFixed(2):'—', got.toFixed(2), exp?Math.round(got/exp*100)+'%':'—', exp?(got-exp).toFixed(2):'—'], u:exp?got/exp:0, c}; })
+        .sort((a,b)=>(a.c?0:1)-(b.c?0:1)||a.u-b.u).map(x=>x.r);
+      if(rows.length) rows.push(['סה"כ','',wd,te.toFixed(2),tl.toFixed(2),te?Math.round(tl/te*100)+'%':'',(tl-te).toFixed(2)]);
+      tot=tl;
+    } else {
+      const wk=d=>{ const x=new Date(d+'T12:00'); x.setDate(x.getDate()-x.getDay()); return localISO(x); };
+      const cols=[...new Set(E.map(e=>wk(e.work_date)))].sort().slice(-12); const cs=new Set(cols); const m=new Map();
+      E.forEach(e=>{ const k=wk(e.work_date); if(!cs.has(k)) return; const o=m.get(e.staff_id)||{}; o[k]=(o[k]||0)+H(e); m.set(e.staff_id,o); });
+      const wdOf=k=>{ const a=k<(f||k)?f:k; const end=new Date(k+'T12:00'); end.setDate(end.getDate()+6); let b=localISO(end); if(b>t2) b=t2; return wdays(a,b); };
+      head=['עובד','היקף משרה',...cols.map(k=>'שבוע '+k.split('-').reverse().join('.').slice(0,5)),'ממוצע']; numFrom=1;
+      rows=visibleStaff().filter(s=>(!who||s.id==who) && (m.has(s.id)||CAP.has(s.full_name))).map(s=>{ const c=CAP.get(s.full_name)||0, o=m.get(s.id)||{}; let se=0, sg=0;
+        const cells=cols.map(k=>{ const exp=c/5*wdOf(k), got=o[k]||0; se+=exp; sg+=got; return exp?Math.round(got/exp*100)+'%':(got?got.toFixed(1)+' ש׳':''); });
+        return {u:se?sg/se:0, c, r:[s.full_name, c?c.toFixed(1):'—', ...cells, se?Math.round(sg/se*100)+'%':'—']}; }).sort((a,b)=>(a.c?0:1)-(b.c?0:1)||a.u-b.u).map(x=>x.r);
+    }
+  }
   const numCol=i=>i>=numFrom||head[i]==='שעות'||head[i]==='דיווחים';
   $('#rTable').innerHTML='<thead><tr>'+head.map((h,i)=>`<th class="${numCol(i)?'num':''}">${h}</th>`).join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map((c,i)=>`<td class="${numCol(i)?'num':''}">${esc(c)}</td>`).join('')+'</tr>').join('')+'</tbody>';
   if(!rows.length) $('#rTable').innerHTML='<tbody><tr><td class="empty">אין דיווחים בטווח שנבחר</td></tr></tbody>';
@@ -1183,7 +1211,7 @@ async function gateApply(n,res,cached){
   if(!res.ver) return {nodata:true};
   let text=res.data; if(text==null){ text=cached.text; } else cachePut(res.ver,text);
   await gateDecrypt(JSON.parse(text),res.k);
-  const i=TRIAL.users.indexOf(n); GATE={user:n,role:res.r,idx:i<0?0:i,sw:!!res.sw,adm:!!res.adm,arch:res.arch||[],tok:res.token||null,mp:res.mp||[],hv:res.hv||[],syncAt:res.syncAt||null};
+  const i=TRIAL.users.indexOf(n); GATE={user:n,role:res.r,idx:i<0?0:i,sw:!!res.sw,adm:!!res.adm,arch:res.arch||[],tok:res.token||null,mp:res.mp||[],hv:res.hv||[],hu:res.hu||[],syncAt:res.syncAt||null};
   return {ok:true};
 }
 async function gateOpen(n,pw,remember){
