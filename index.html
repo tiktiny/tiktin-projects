@@ -2,6 +2,9 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://wiwdszhdjnzyrbxxakbm.supabase.co wss://wiwdszhdjnzyrbxxakbm.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
+<script>/* אבטחה: האפליקציה לא נטענת בתוך מסגרת של אתר אחר */ if(window.top!==window.self){ document.documentElement.style.display="none"; try{ window.top.location.replace(window.self.location.href); }catch(e){} }</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PROJECTS · טיקטין</title>
 <link rel="icon" href="icon-192.png">
@@ -509,8 +512,8 @@ details.more summary{cursor:pointer;color:var(--muted);font-size:12px;margin:4px
 <script id="trialCfg" type="application/json">{"users": ["ערבה", "ליטל", "שרית", "חגית", "יובל", "אמיר", "נדב", "לירז", "אורטל", "מורן", "קובי", "שלי"]}</script>
 <script>
 /* ================= CONFIG ================= */
-const VERSION = '0.33';
-const VERSION_DATE = '08.11.2026';
+const VERSION = '0.34';
+const VERSION_DATE = '13.11.2026';
 /* תקופת הרצה: נתונים כספיים מושבתים לכל המשתמשים (גם הנהלה וכספים) */
 const FIN_OFF = true;
 const SUPABASE_URL = 'https://wiwdszhdjnzyrbxxakbm.supabase.co';
@@ -521,7 +524,7 @@ const ROLE_HE = {management:'הנהלה',finance:'כספים',secretary:'מזכ�
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
-const esc = s => (s??'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc = s => (s??'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtMoney = n => n==null||n===''||+n===0?'—':'₪ '+Number(n).toLocaleString('he-IL',{maximumFractionDigits:0});
 const today = () => { const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
 const toast = m => {const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200)};
@@ -1202,7 +1205,7 @@ function tableFor(id){
 }
 function cleanClone(t){ const c=t.cloneNode(true); c.querySelectorAll('.noprint').forEach(e=>e.remove()); return c; }
 let xlsxLoading=null;
-function loadXLSX(){ return xlsxLoading ||= new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)}); }
+function loadXLSX(){ return xlsxLoading ||= new Promise((ok,no)=>{const s=document.createElement('script');s.src='xlsx.full.min.js'; s.integrity='sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw';s.onload=ok;s.onerror=no;document.head.appendChild(s)}); }
 $$('[data-exp]').forEach(b=>b.onclick=async()=>{
   FLUSH[b.dataset.t]?.();
   const t=cleanClone(tableFor(b.dataset.t)), name='PROJECTS_'+b.dataset.t+'_'+today();
@@ -1298,8 +1301,8 @@ async function gateUpload(n,pw,file){
   const text=await file.text(); const E=JSON.parse(text); if(!E.ct||!E.iv) throw new Error('קובץ לא תקין');
   const CH=400000;
   for(let i=0;i<text.length;i+=CH){ $('#gateErr').textContent=`מעלה… ${Math.min(100,Math.round((i+CH)/text.length*100))}%`;
-    await rpc('demo_put',{p_user:n,p_pw:pw,p_k:'data_new',p_v:text.slice(i,i+CH),p_append:i>0}); }
-  await rpc('demo_put',{p_user:n,p_pw:pw,p_k:'commit',p_v:E.ver||String(Date.now()),p_append:false});
+    const r=await rpc('demo_put',{p_user:n,p_pw:pw,p_k:'data_new',p_v:text.slice(i,i+CH),p_append:i>0}); if(r<0){ const e=new Error(r===-2?'locked':'denied'); e.status=400; throw e; } }
+  const c=await rpc('demo_put',{p_user:n,p_pw:pw,p_k:'commit',p_v:E.ver||String(Date.now()),p_append:false}); if(c<0){ const e=new Error(c===-2?'locked':'denied'); e.status=400; throw e; }
 }
 function gateMode(mode){ /* login | change | forgot | reset */
   ['#gLogin','#gChange','#gReset'].forEach(x=>$(x).classList.add('hide'));
@@ -1308,6 +1311,7 @@ function gateMode(mode){ /* login | change | forgot | reset */
   $('#gateErr').textContent=''; $('#gateMsg').textContent='';
 }
 const errMsg=e=> !e.status ? 'אין חיבור לשרת – בדוק/י את האינטרנט ונסה/י שוב'
+  : /locked/.test(e.message) ? 'יותר מדי ניסיונות שגויים – הכניסה חסומה ל-15 דקות. אפשר לקבוע סיסמה חדשה דרך "שכחתי סיסמה"'
   : /bad|denied/.test(e.message) ? 'סיסמה שגויה' : /short/.test(e.message) ? 'הסיסמה החדשה קצרה מדי – לפחות 8 תווים'
   : /invalid/.test(e.message) ? 'הקישור לא בתוקף או שכבר נוצל – בקש/י קישור חדש' : /expired/.test(e.message) ? 'פג תוקף הכניסה השמורה – היכנס/י שוב'
   : 'שגיאה: '+e.message.slice(0,120);
@@ -1445,7 +1449,7 @@ async function boot(){
     if(REAL!==false){ const sp=document.createElement('b'); sp.style.marginRight='auto'; sp.textContent=`נטען ומוצג תוך ${((performance.now()-tB)/1000).toFixed(1)} שניות`; $('#demoBar').appendChild(sp); }
     return;
   }
-  await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+  await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js'; s.integrity='sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o'; s.crossOrigin='anonymous';s.onload=ok;s.onerror=no;document.head.appendChild(s)});
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   DB = sbDB(sb);
   const redirect = location.origin + location.pathname;
